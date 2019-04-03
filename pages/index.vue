@@ -15,6 +15,11 @@
           <div class="text-xs-right">
             <em><small>&mdash; John Leider</small></em>
           </div>
+
+          <v-btn @click="log()">
+            footer
+          </v-btn>
+
           <hr class="my-3">
           <a href="https://nuxtjs.org/" target="_blank">Nuxt Documentation</a>
           <br>
@@ -28,3 +33,14 @@
     </v-flex>
   </v-layout>
 </template>
+
+<script>
+export default {
+  methods: {
+    log: async function () {
+      eel.hello()((result) => console.log(result))
+    }
+  }
+}
+</script>
+

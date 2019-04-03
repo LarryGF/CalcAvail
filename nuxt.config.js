@@ -14,6 +14,10 @@ module.exports = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' }
+    ],
+    script: [
+      { src: 'http://localhost:8686/eel.js' },
+      { src: 'http://localhost:8686/eel.config.js' }
     ]
   },
   plugins: ['~/plugins/vuetify.js'],
@@ -30,24 +34,24 @@ module.exports = {
     plugins: [
       new VuetifyLoaderPlugin()
     ],
-    extractCSS: true,
-    extend (config, ctx) {
-      // Run ESLint on save
-      if (ctx.isDev && ctx.isClient) {
-        config.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /(node_modules)/
-        })
-      }
-      if (process.server) {
-        config.externals = [
-          nodeExternals({
-            whitelist: [/^vuetify/]
-          })
-        ]
-      }
-    }
+    extractCSS: true
+    // extend (config, ctx) {
+    //   // Run ESLint on save
+    //   if (ctx.isDev && ctx.isClient) {
+    //     config.module.rules.push({
+    //       enforce: 'pre',
+    //       test: /\.(js|vue)$/,
+    //       loader: 'eslint-loader',
+    //       exclude: /(node_modules)/
+    //     })
+    //   }
+    //   if (process.server) {
+    //     config.externals = [
+    //       nodeExternals({
+    //         whitelist: [/^vuetify/]
+    //       })
+    //     ]
+    //   }
+    // }
   }
 }
