@@ -1,0 +1,217 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Force Layout with labels on edges</title>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<style type="text/css">
+</style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var w = 800;
+var h = 400;
+//distance between nodes
+var linkDistance = 200;
+
+var colors = d3.scale.category10();
+
+var dataset = {
+
+  nodes: [{
+      name: "Car"
+    },
+    {
+      name: "Jeep"
+    },
+    {
+    	name: "moto"
+    }
+  ],
+  edges: [{
+    source: 0,
+    target: 0
+  }],
+  methlbl: [{
+    name: "add(int, int)"
+  }]
+};
+
+var svg = d3.select("body").append("svg").attr({
+  "width": w,
+  "height": h
+});
+
+var force = d3.layout.force()
+  .nodes(dataset.nodes)
+  .links(dataset.edges)
+  .size([w, h])
+  .linkDistance([linkDistance])
+  .charge([-500])
+  .theta(0.1)
+  .gravity(0.05)
+  .start();
+
+var edges = svg.selectAll("path")
+  .data(dataset.edges)
+  .enter()
+  .append("path")
+  .style("fill","none")
+  .attr("id", function(d, i) {
+    return 'edge' + i
+  })
+  .attr('marker-end', function(d) {
+    return d.source == d.target ? '' : 'url(#arrowhead)'
+  })
+  .style("stroke", "#ccc")
+  .style("pointer-events", "none");
+
+var nodes = svg.selectAll("circle")
+  .data(dataset.nodes)
+  .enter()
+  .append("circle")
+  .attr({
+    "r": 15
+  })
+  .style("fill", function(d, i) {
+    return colors(4);
+  })
+  .call(force.drag)
+
+
+var nodelabels = svg.selectAll(".nodelabel")
+  .data(dataset.nodes)
+  .enter()
+  .append("text")
+  .attr({
+    "x": function(d) {
+      return d.x;
+    },
+    "y": function(d) {
+      return d.y;
+    },
+    "class": "nodelabel",
+    "stroke": "black"
+  })
+  .text(function(d) {
+    return d.name;
+  });
+
+var edgelabels = svg.selectAll(".edgelabel")
+  .data(dataset.edges)
+  .enter()
+  .append('text')
+  .style("pointer-events", "none")
+  .attr({
+    'class': 'edgelabel',
+    'id': function(d, i) {
+      return 'edgelabel' + i
+    },
+    'font-size': 20,
+    'fill': '#aaa'
+  })
+
+
+edgelabels.append("textPath")
+  .attr("xlink:href", function(d, i) {
+    return '#edge' + i;
+  })
+  .style("pointer-events", "none")
+  .text(function(d, i) {
+    return dataset.methlbl[i].name
+  });
+
+
+svg.append('defs').append('marker')
+  .attr({
+    'id': 'arrowhead',
+    'viewBox': '-0 -5 10 10',
+    'refX': 25,
+    'refY': 0,
+    'orient': 'auto',
+    'markerWidth': 10,
+    'markerHeight': 10,
+    'xoverflow': 'visible'
+  })
+  .append('svg:path')
+  .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+  .attr('fill', '#ccc')
+  .attr('stroke', '#ccc');
+
+
+force.on("tick", function() {
+
+
+  edges.attr("d", function(d) {
+    var x1 = d.source.x,
+      y1 = d.source.y,
+      x2 = d.target.x,
+      y2 = d.target.y,
+      dx = x2 - x1,
+      dy = y2 - y1,
+      dr = Math.sqrt(dx * dx + dy * dy),
+
+      // Defaults for normal edge.
+      drx = dr,
+      dry = dr,
+      xRotation = 0, // degrees
+      largeArc = 0, // 1 or 0
+      sweep = 1; // 1 or 0
+
+    // Self edge.
+    if (x1 === x2 && y1 === y2) {
+      // Fiddle with this angle to get loop oriented.
+      xRotation = -45;
+
+      // Needs to be 1.
+      largeArc = 1;
+
+      // Change sweep to change orientation of loop. 
+      //sweep = 0;
+
+      // Make drx and dry different to get an ellipse
+      // instead of a circle.
+      drx = 30;
+      dry = 20;
+
+      // For whatever reason the arc collapses to a point if the beginning
+      // and ending points of the arc are the same, so kludge it.
+      x2 = x2 + 1;
+      y2 = y2 + 1;
+    }
+
+    return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
+  });
+
+  nodes.attr({
+    "cx": function(d) {
+      return d.x;
+    },
+    "cy": function(d) {
+      return d.y;
+    }
+  });
+
+  edgelabels.selectAll("textPath")
+    .attr("xlink:href", function(d, i) {
+      return '#edge' + i;
+    })
+    .attr("startOffset", function(d, i) {
+      var arcLength = d3.select("#edge" + i).node().getTotalLength();
+      var textLength = d3.select("#edgelabel" + i).node().getComputedTextLength();
+      var offset = (arcLength - textLength) / 2;
+      return offset;
+    });
+  nodelabels.attr("x", function(d) {
+      return d.x;
+    })
+    .attr("y", function(d) {
+      return d.y;
+    });
+});
+</script>
+
+</body>
+</html>
