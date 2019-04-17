@@ -35,7 +35,7 @@
             v-for="(item, index) in graph.nodes"
             stroke="black"
             :x="item.x -8"
-            :y="item.y +4"
+            :y="item.y -4"
             :key="'label' + index"
             class="nodelabel"
           >{{item.id}}</text>
@@ -89,33 +89,33 @@ export default {
       viewBox: "0 0 960 600",
       graph: {
         nodes: [
-          // {
-          //   id: "Alice",
-          //   x: 10.0,
-          //   y: 10.0
-          // },
-          // {
-          //   id: "Bob",
-          //   x: 200.0,
-          //   y: 200.0
-          // },
-          // {
-          //   id: "Carol",
-          //   x: 300.0,
-          //   y: 300.0
-          // }
+          {
+            id: "Alice",
+            x: 10.0,
+            y: 10.0
+          },
+          {
+            id: "Bob",
+            x: 200.0,
+            y: 200.0
+          },
+          {
+            id: "Carol",
+            x: 300.0,
+            y: 300.0
+          }
         ],
         links: [
-          // {
-          //   source: 1,
-          //   target: 1,
-          //   text: "0.5"
-          // },
-          // {
-          //   source: 1,
-          //   target: 2,
-          //   text: "0.6"
-          // },
+          {
+            source: 0,
+            target: 1,
+            text: "0.5"
+          },
+          {
+            source: 0,
+            target: 2,
+            text: "0.6"
+          }
           // {
           //   source: 2,
           //   target: 1,
@@ -138,6 +138,7 @@ export default {
     DeleteDialog
   },
   mounted: function() {
+    this.loadFromEel()
     this.viewBox =
       "0 0 " +
       String(window.innerWidth * 0.8) +
@@ -148,32 +149,93 @@ export default {
     this.run_simulation();
   },
   methods: {
+
+    loadFromEel: function(){
+      let that = this
+      // var result = null
+      eel.data()((a) => {
+        // console.log(a);
+      this.graph = this.loadFromJson(a);
+      this.run_simulation();
+      console.log(this.graph)
+      })
+    },
+
+    loadFromJson: function(json){
+        for (var node in json.nodes){      
+          json.nodes[node].x =  Math.random() * this.settings.svgWigth
+          json.nodes[node].y =  Math.random() * this.settings.svgHeight
+          json.nodes[node].vx = 0
+          json.nodes[node].vy = 0
+        }
+        // console.log(json)
+
+        return json
+    },
+    tick: function() {
+      for (let i = 0; i < this.graph.nodes.length; i++) {
+        const element = this.graph.nodes[i];
+        if (element.x < 0) {
+          element.x = 0 + 15;
+        }
+        if (element.y < 0) {
+          element.y = 0 + 15;
+        }
+        if (element.x > this.settings.svgWigth) {
+          element.x = this.svgWigth - 15;
+        }
+        if (element.y > this.settings.svgHeight) {
+          element.y = this.svgHeight - 15;
+        }
+      }
+    },
     run_simulation: function() {
       var that = this;
 
       that.simulation = d3
         .forceSimulation(that.graph.nodes)
+        .on("tick", this.tick)
         .force(
           "link",
           d3
             .forceLink(that.graph.links)
-            .distance(200)
-            .strength(0.1)
+            // .distance(200)
+            .strength(0.01)
         )
-        .force("charge", d3.forceManyBody())
         .force(
           "center",
           d3.forceCenter(
             that.settings.svgWigth / 2,
             that.settings.svgHeight / 2
           )
-        );
+        )
+        .force("collision", d3.forceCollide().radius(100));
+      // .force(
+      //   "charge",
+      //   d3
+      //     .forceManyBody()
+      //     .strength(-300)
+      //     .distanceMin(200)
+      // )
+
+      // d3.layout
+      //   .force()
+      //   .nodes(dataset.nodes)
+      //   .links(dataset.edges)
+      //   .size([w, h])
+      //   .linkDistance([linkDistance])
+      //   .charge([-500])
+      //   .theta(0.1)
+      //   .gravity(0.05)
+      //   .start();
     },
     add_node: function() {
       this.graph.nodes.push({
         id: "S" + String(this.stateNumber),
-        x: 10.0,
-        y: 10.0
+        x: Math.random() * this.settings.svgWigth,
+        y: Math.random() * this.settings.svgHeight,
+        vx: 0,
+        vy: 0
       });
       this.stateNumber++;
       this.run_simulation();
@@ -195,7 +257,7 @@ export default {
         }
       }
       this.graph.links.push({
-        id:data.fromState.id + '=>' + data.toState.id,
+        id: data.fromState.id + "=>" + data.toState.id,
         source: this.graph.nodes.indexOf(data.fromState),
         target: this.graph.nodes.indexOf(data.toState),
         text: parseFloat(data.rate)
@@ -220,46 +282,48 @@ export default {
       this.delete_dialog = true;
     },
 
-    delete_element: function (data) {
-      this.delete_dialog = false
-      if (this.delete_title === "transition"){
-        this.delete_title = ""
-        for (var link in this.graph.links){
-          if (this.graph.links[link].id === data){
-            this.graph.links.splice(link,1)
+    delete_element: function(data) {
+      this.delete_dialog = false;
+      if (this.delete_title === "transition") {
+        this.delete_title = "";
+        for (var link in this.graph.links) {
+          if (this.graph.links[link].id === data) {
+            this.graph.links.splice(link, 1);
           }
         }
-
-      }
-      else if (this.delete_title === "node"){
-        this.delete_title = ""
-        var links_to_delete = []
+      } else if (this.delete_title === "node") {
+        this.delete_title = "";
+        var links_to_delete = [];
         for (var node in this.graph.nodes) {
-        if (this.graph.nodes[node].id === data) {
-          this.graph.nodes.splice(node,1)
-          for (var link in this.graph.links){
-            console.log(this.graph.links[link])
-            if (this.graph.links[link].source.id === data || this.graph.links[link].target.id === data){
-              links_to_delete.push(link)
-            } 
-          }
-          for (var link in links_to_delete){
-              this.graph.links.splice(link,1)
-
+          if (this.graph.nodes[node].id === data) {
+            this.graph.nodes.splice(node, 1);
+            for (var link in this.graph.links) {
+              console.log(this.graph.links[link]);
+              if (
+                this.graph.links[link].source.id === data ||
+                this.graph.links[link].target.id === data
+              ) {
+                links_to_delete.push(link);
+              }
+            }
+            for (var link in links_to_delete) {
+              this.graph.links.splice(link, 1);
+            }
           }
         }
-      }
       }
       this.run_simulation();
-
     },
     d: function(source, target) {
-      console.log("Source: ");
-      console.log(source);
+      // console.log("Source: ");
+      // console.log(source);
       //   source = this.graph.nodes[source];
       //   target = this.graph.nodes[target];
-      console.log(source);
-      console.log(target);
+      // console.log(source);
+      // console.log("Target: ");
+
+
+      // console.log(target);
       var x1 = source.x,
         y1 = source.y,
         x2 = target.x,
@@ -267,8 +331,19 @@ export default {
         dx = x2 - x1,
         dy = y2 - y1,
         ff;
-      console.log(Math);
-      console.log(Math.sqrt(dx * dx + dy * dy));
+
+      if (isNaN(source.x) || isNaN(target.x)) {
+        x1 = 0;
+        x2 = 100;
+        dx = 100;
+      }
+      if (isNaN(source.y) || isNaN(target.y)) {
+        y1 = 0;
+        y2 = 100;
+        dy = 100;
+      }
+      // console.log(Math);
+      // console.log(Math.sqrt(dx * dx + dy * dy));
       var dr = Math.sqrt(dx * dx + dy * dy),
         // Defaults for normal edge.
         drx = dr,
