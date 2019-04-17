@@ -9,28 +9,53 @@
           :viewBox="viewBox"
           preserveAspectRatio="xMinYMin meet"
         >
-          <circle
-            
-            r="20"
-            v-for="(item, index) in graph.nodes"
-            :cx="item.x"
-            :cy="item.y"
-            :key="index"
-            fill="#fff"
-          ></circle>
-
           <path
             fill="none"
             stroke="yellow"
             stroke-width="5"
             v-for="(item, index) in graph.links"
-            :key="index"
+            :key="'line'+index"
             :d="d(item.source, item.target)"
+            :id="'edge' + index"
           ></path>
+
+          <circle
+            r="20"
+            v-for="(item, index) in graph.nodes"
+            :cx="item.x"
+            :cy="item.y"
+            :key="'circle' + index"
+            fill="#fff"
+          ></circle>
+
+          <text
+            v-for="(item, index) in graph.nodes"
+            stroke="white"
+            :x="item.x"
+            :y="item.y"
+            :key="'label' + index"
+            class="nodelabel"
+          >{{item.id}}</text>
+
+          <text
+            v-for="(item, index) in graph.links"
+            :key="'labeledge' + index"
+            class="edgelabel"
+            :id="'edgelabel' + index"
+            font-size="20"
+            fill="#aaa"
+            style="pointer-events: none;"
+          >
+            <textPath
+              stroke="yellow"
+              stroke-width="5"
+              :href="'#edge' + index"
+              startOffset="44.5"
+            >{{item.text}}</textPath>
+          </text>
         </svg>
       </div>
     </v-flex>
-    <v-btn>Loren</v-btn>
   </v-layout>
 </template>
 
@@ -39,6 +64,7 @@ import * as d3 from "d3";
 export default {
   data: function() {
     return {
+      simulation: null,
       viewBox: '0 0 960 600' ,
       graph: {
         nodes: [
@@ -52,18 +78,23 @@ export default {
             x: 200.0,
             y: 200.0
           },
-          
-          
+          {
+            id: "Carol",
+            x: 300.0,
+            y: 300.0
+          }
         ],
         links: [
-        //   {
-        //     source: 0,
-        //     target: 1
-        //   },
-        //   {
-        //     source: 1,
-        //     target: 2
-        //   }
+          {
+            source: 1,
+            target: 1,
+            text: "la polla"
+          },
+          {
+            source: 1,
+            target: 2,
+            text: "lacebolla"
+          }
         ]
       },
       simulation: null,
@@ -71,121 +102,36 @@ export default {
       settings: {
         strokeColor: "#29B5FF",
         width: 100,
-        svgWigth: '960',
-        svgHeight: '600'
+        svgWigth: 960,
+        svgHeight: 600
       }
     };
   },
-  mounted () {
-      this.viewBox = '0 0 ' + String(window.innerWidth*0.8) + ' ' + String(window.innerHeight*0.8)
-  },
-  computed: {
-    nodes: function() {
-      var that = this;
-      console.log("Nodes: ");
-      console.log(that.graph);
-      if (that.graph) {
-        return d3
-          .select("svg")
-          .append("g")
-          .attr("class", "nodes")
-          .selectAll("circle")
-          .data(that.graph.nodes)
-          .enter()
-          .append("circle")
-          .attr("r", 20)
-          .attr("fill", function(d, i) {
-            return that.color(i);
-          })
-          .call(
-            d3
-              .drag()
-              .on("start", function dragstarted(d) {
-                if (!d3.event.active)
-                  that.simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-              })
-              .on("drag", function dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
-              })
-              .on("end", function dragended(d) {
-                if (!d3.event.active) that.simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-              })
-          );
-      }
-    }
-    // links: function () {
-    //     var that = this;
-    //     if (that.graph) {
-    //         return d3.select("svg").append("g")
-    //             .attr("class", "links")
-    //             .selectAll("line")
-    //             .data(that.graph.links)
-    //             .enter().append("line")
-    //             .attr("stroke-width", function (d) { return Math.sqrt(d.value); });
-    //     }
-    // },
 
-    // links: function () {
-    //     var that = this;
-    //     if (that.graph) {
-    //         return d3.select("svg").append("g")
-    //             .attr("class", "links")
-    //             .selectAll("path")
-    //             .data(that.graph.links)
-    //             .enter().append("path")
-    //             .attr("stroke-width", function (d) { return Math.sqrt(d.value); });
-    //     }
-    // },
-  },
-  updated: function() {
-    // var that = this;
-    // that.simulation.nodes(that.graph.nodes).on("tick", function ticked() {
-    //   that.links
-    //     .attr("x1", function(d) {
-    //       return d.source.x;
-    //     })
-    //     .attr("y1", function(d) {
-    //       return d.source.y;
-    //     })
-    //     .attr("x2", function(d) {
-    //       return d.target.x;
-    //     })
-    //     .attr("y2", function(d) {
-    //       return d.target.y;
-    //     });
+  mounted: function() {
+    var that = this;
 
-    //   that.nodes
-    //     .attr("cx", function(d) {
-    //       return d.x;
-    //     })
-    //     .attr("cy", function(d) {
-    //       return d.y;
-    //     });
-    // });
+    that.simulation = d3
+      .forceSimulation(that.graph.nodes)
+      .force(
+        "link",
+        d3
+          .forceLink(that.graph.links)
+          .distance(100)
+          .strength(0.1)
+      )
+      .force("charge", d3.forceManyBody())
+      .force(
+        "center",
+        d3.forceCenter(that.settings.svgWigth / 2, that.settings.svgHeight / 2)
+      );
   },
   methods: {
-    print: function (event) {
-       this.graph.nodes = this.graph.nodes.concat([
-           {
-               id:'loren',
-               x: event.offsetX - 10,
-               y: event.offsetY - 10
-           },
-           
-       ])
-
-
-      console.log(event)
-    },
     d: function(source, target) {
-      // console.
-      source = this.graph.nodes[source];
-      target = this.graph.nodes[target];
+      console.log("Source: ")
+      console.log(source)
+    //   source = this.graph.nodes[source];
+    //   target = this.graph.nodes[target];
       console.log(source);
       console.log(target);
       var x1 = source.x,
