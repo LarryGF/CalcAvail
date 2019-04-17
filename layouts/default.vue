@@ -25,8 +25,8 @@
       </v-list>
     </v-navigation-drawer>
     <v-toolbar fixed app :clipped-left="clipped">
-      <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn
+      <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
+      <!-- <v-btn
         icon
         @click.stop="miniVariant = !miniVariant"
       >
@@ -43,26 +43,27 @@
         @click.stop="fixed = !fixed"
       >
         <v-icon>remove</v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn
+      <!-- <v-btn
         icon
         @click.stop="rightDrawer = !rightDrawer"
       >
         <v-icon>menu</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-toolbar>
     <v-content>
-      <v-container>
+      <!-- <v-container> -->
         <nuxt />
-      </v-container>
+      <!-- </v-container> -->
     </v-content>
     <v-navigation-drawer
       temporary
       :right="right"
       v-model="rightDrawer"
       fixed
+      class="hidden-lg-and-down"
     >
       <v-list>
         <v-list-tile @click.native="right = !right">
@@ -85,15 +86,15 @@
       return {
         clipped: false,
         drawer: true,
-        fixed: false,
+        fixed: true,
         items: [
           { icon: 'apps', title: 'Welcome', to: '/' },
-          { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' }
+          { icon: 'bubble_chart', title: 'Markov', to: '/noutech' }
         ],
         miniVariant: false,
         right: true,
         rightDrawer: false,
-        title: 'Vuetify.js'
+        title: 'Markovify'
       }
     }
   }

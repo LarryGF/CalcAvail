@@ -23,11 +23,6 @@ export default {
 data: function () {
                 return {
                     graph: null,
-
-
-
-
-                    
                     simulation: null,
                     color: d3.scaleOrdinal(20),
                     settings: {
@@ -51,6 +46,9 @@ data: function () {
         },
         {
             id: "Carol"
+        },
+        {
+            id:'loren'
         }
     ],
     links: [
@@ -121,6 +119,18 @@ data: function () {
                     }
                 },
 
+                // links: function () {
+                //     var that = this;
+                //     if (that.graph) {
+                //         return d3.select("svg").append("g")
+                //             .attr("class", "links")
+                //             .selectAll("path")
+                //             .data(that.graph.links)
+                //             .enter().append("path")
+                //             .attr("stroke-width", function (d) { return Math.sqrt(d.value); });
+                //     }
+                // },
+
             },
             updated: function () {
                 var that = this;
@@ -140,11 +150,11 @@ data: function () {
 </script>
 
 <style>
-body {
+/* body {
             width: 100%;
             height: 100%;
             font-family: monospace;
-        }
+        } */
 
         .controls {
             position: fixed;
@@ -159,7 +169,7 @@ body {
         .svg-container {
             display: table;
             border: 1px solid #f8f8f8;
-            box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
+            box-shadow: 1px 2px 4px rgba(253, 253, 253, 0.5);
         }
 
         .controls>*+* {
@@ -179,4 +189,9 @@ body {
             stroke: #fff;
             stroke-width: 1.5px;
         }
+
+        
+svg {
+    background: black;
+}
 </style>
