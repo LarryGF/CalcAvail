@@ -1,14 +1,10 @@
 <template>
-  <v-layout>
-    <v-flex xs12>
+  <v-layout column>
+    <Dialog :dialog="dialog" @close="dialog=false"/>
 
-      <div  class="svg-container" :style="{width: settings.width + '%'}">
-        <svg
-          id="svg"
-          pointer-events="all"
-          :viewBox="viewBox"
-          preserveAspectRatio="xMinYMin meet"
-        >
+    <v-flex xs12>
+      <div class="svg-container" :style="{width: settings.width + '%' }">
+        <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
           <path
             fill="none"
             stroke="yellow"
@@ -20,7 +16,7 @@
           ></path>
 
           <circle
-            r="20"
+            r="40"
             v-for="(item, index) in graph.nodes"
             :cx="item.x"
             :cy="item.y"
@@ -30,9 +26,9 @@
 
           <text
             v-for="(item, index) in graph.nodes"
-            stroke="white"
-            :x="item.x"
-            :y="item.y"
+            stroke="black"
+            :x="item.x -8"
+            :y="item.y +4"
             :key="'label' + index"
             class="nodelabel"
           >{{item.id}}</text>
@@ -56,16 +52,28 @@
         </svg>
       </div>
     </v-flex>
+    <v-flex xs12>
+      <v-layout row>
+        <v-spacer></v-spacer>
+        <v-btn @click="add_node">Add Node</v-btn>
+        <v-btn @click="dialog=true">Add transition</v-btn>
+        <v-spacer></v-spacer>
+      </v-layout>
+    </v-flex>
   </v-layout>
 </template>
 
 <script>
 import * as d3 from "d3";
+import Dialog from "../components/Dialog.vue";
+
 export default {
   data: function() {
     return {
+      dialog: false,
+      stateNumber: 0,
       simulation: null,
-      viewBox: '0 0 960 600' ,
+      viewBox: "0 0 960 600",
       graph: {
         nodes: [
           {
@@ -94,6 +102,11 @@ export default {
             source: 1,
             target: 2,
             text: "lacebolla"
+          },
+          {
+            source: 1,
+            target: 2,
+            text: "lacebolla"
           }
         ]
       },
@@ -107,31 +120,55 @@ export default {
       }
     };
   },
-
+  components: {
+    Dialog
+  },
   mounted: function() {
-    var that = this;
-
-    that.simulation = d3
-      .forceSimulation(that.graph.nodes)
-      .force(
-        "link",
-        d3
-          .forceLink(that.graph.links)
-          .distance(100)
-          .strength(0.1)
-      )
-      .force("charge", d3.forceManyBody())
-      .force(
-        "center",
-        d3.forceCenter(that.settings.svgWigth / 2, that.settings.svgHeight / 2)
-      );
+    this.viewBox =
+      "0 0 " +
+      String(window.innerWidth * 0.8) +
+      " " +
+      String(window.innerHeight * 0.8);
+    this.settings.svgWigth = window.innerWidth * 0.8;
+    this.settings.svgHeight = window.innerHeight * 0.8;
+    this.run_simulation();
   },
   methods: {
+    run_simulation: function() {
+      var that = this;
+
+      that.simulation = d3
+        .forceSimulation(that.graph.nodes)
+        .force(
+          "link",
+          d3
+            .forceLink(that.graph.links)
+            .distance(200)
+            .strength(0.1)
+        )
+        .force("charge", d3.forceManyBody())
+        .force(
+          "center",
+          d3.forceCenter(
+            that.settings.svgWigth / 2,
+            that.settings.svgHeight / 2
+          )
+        );
+    },
+    add_node: function() {
+      this.graph.nodes.push({
+        id: "S" + String(this.stateNumber),
+        x: 10.0,
+        y: 10.0
+      });
+      this.stateNumber++;
+      this.run_simulation();
+    },
     d: function(source, target) {
-      console.log("Source: ")
-      console.log(source)
-    //   source = this.graph.nodes[source];
-    //   target = this.graph.nodes[target];
+      console.log("Source: ");
+      console.log(source);
+      //   source = this.graph.nodes[source];
+      //   target = this.graph.nodes[target];
       console.log(source);
       console.log(target);
       var x1 = source.x,
@@ -240,6 +277,6 @@ label {
 }
 
 svg {
-  background: black;
+  background: transparent;
 }
 </style>

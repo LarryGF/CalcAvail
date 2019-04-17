@@ -54,9 +54,9 @@
       </v-btn> -->
     </v-toolbar>
     <v-content>
-      <!-- <v-container> -->
+      <v-container class="pb-1 pt-3">
         <nuxt />
-      <!-- </v-container> -->
+      </v-container>
     </v-content>
     <v-navigation-drawer
       temporary
