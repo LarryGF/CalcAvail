@@ -12,16 +12,41 @@
     <v-flex xs12>
       <div class="svg-container" :style="{width: settings.width + '%' }">
         <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
+          <defs>
+            <marker
+              id="arrowhead"
+              viewBox="-0 -5 100 100"
+              refX="0"
+              refY="0"
+              orient="auto"
+              markerWidth="10%"
+              markerHeight="5%"
+              xoverflow="visible"
+              preserveAspectRatio="xMinYMin meet"
+            >
+              <path
+              d="M 0,-5 L 10 ,0 L 0,5"
+              fill= yellow
+              stroke= yellow
+              >
+
+              </path>
+            </marker>
+          </defs>
+          
+
           <path
             fill="none"
             stroke="yellow"
-            :stroke-width="parseFloat(item.text)"
             v-for="(item, index) in graph.links"
+            :stroke-width="item.width"
             :key="'line'+index"
             :d="d(item.source, item.target)"
             :id="'edge' + index"
-          ></path>
+            marker-mid="url(#arrowhead)"
+            pointer-events= none
 
+          ></path>
           <circle
             r="40"
             v-for="(item, index) in graph.nodes"
@@ -48,15 +73,17 @@
             font-size="20"
             fill="#aaa"
             style="pointer-events: none;"
-            dy="-10"
+            dy="-15"
           >
             <textPath
               stroke="white"
               stroke-width="1.5"
               :href="'#edge' + index"
-              startOffset="42%"
+              startOffset="47%"
             >{{item.text}}</textPath>
           </text>
+
+
         </svg>
       </div>
     </v-flex>
@@ -90,38 +117,6 @@ export default {
       viewBox: "0 0 960 600",
       graph: {
         nodes: [
-          {
-            id: "Alice",
-            x: 10.0,
-            y: 10.0
-          },
-          {
-            id: "Bob",
-            x: 200.0,
-            y: 200.0
-          },
-          {
-            id: "Carol",
-            x: 300.0,
-            y: 300.0
-          }
-        ],
-        links: [
-          {
-            source: 0,
-            target: 1,
-            text: "0.5"
-          },
-          {
-            source: 0,
-            target: 2,
-            text: "0.6"
-          }
-          // {
-          //   source: 2,
-          //   target: 1,
-          //   text: "0.45"
-          // }
         ]
       },
       simulation: null,
@@ -139,7 +134,7 @@ export default {
     DeleteDialog
   },
   mounted: function() {
-    this.loadFromEel()
+    this.loadFromEel();
     this.viewBox =
       "0 0 " +
       String(window.innerWidth * 0.8) +
@@ -150,34 +145,44 @@ export default {
     this.run_simulation();
   },
   methods: {
-
-    loadFromEel: function(){
-      let that = this
+    loadFromEel: function() {
+      let that = this;
       // var result = null
-      eel.data()((a) => {
+      eel.data()(a => {
         // console.log(a);
-      this.graph = this.loadFromJson(a);
-      this.run_simulation();
-      console.log(this.graph)
-      })
+        this.graph = this.loadFromJson(a);
+        this.run_simulation();
+        console.log(this.graph);
+      });
     },
 
-    loadFromJson: function(json){
-        for (var node in json.nodes){      
-          json.nodes[node].x =  Math.random() * this.settings.svgWigth
-          json.nodes[node].y =  Math.random() * this.settings.svgHeight
-          json.nodes[node].vx = 0
-          json.nodes[node].vy = 0
-        }
-        // console.log(json)
+    loadFromJson: function(json) {
+      for (var node in json.nodes) {
+        json.nodes[node].x = Math.random() * this.settings.svgWigth;
+        json.nodes[node].y = Math.random() * this.settings.svgHeight;
+        json.nodes[node].vx = 0;
+        json.nodes[node].vy = 0;
+      }
+      console.log(json.links)
+      var m = json.links.map((j) => j.ratio).reduce((a,b) => Math.max(a,b))
+      console.log('m')
+      console.log(m)
 
-        return json
+      for (var link in json.links) {
+        json.links[link].text = json.links[link].ratio
+        json.links[link].width = (json.links[link].ratio / m) *3 + 2
+
+      }
+      // console.log(json)
+
+      return json;
     },
     tick: function() {
       for (let i = 0; i < this.graph.nodes.length; i++) {
         const element = this.graph.nodes[i];
-        if (isNaN(element.x ) || isNaN(element.y)){
-          console.log(element)
+        //pam pam pam pam, can't touch this
+        if (isNaN(element.x) || isNaN(element.y)) {
+          console.log(element);
         }
         if (element.x < 0) {
           element.x = 0 + 15;
@@ -195,7 +200,7 @@ export default {
     },
     run_simulation: function() {
       var that = this;
-      
+
       that.simulation = d3
         .forceSimulation(that.graph.nodes)
         .on("tick", this.tick)
@@ -214,7 +219,7 @@ export default {
           )
         )
         .force("collision", d3.forceCollide().radius(100));
-        
+
       // .force(
       //   "charge",
       //   d3
@@ -328,7 +333,6 @@ export default {
       //   target = this.graph.nodes[target];
       // console.log(source);
       // console.log("Target: ");
-
 
       // console.log(target);
       var x1 = source.x,

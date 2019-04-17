@@ -137,7 +137,7 @@ class MarkovChain:
                 {
                     'source': pos[node.nodeid],
                     'target': pos[link.nodeid],
-                    'text': str(value)
+                    'ratio': value
                 } for node in self.nodes for link, value in node.outgoing.items()
             ]
         }

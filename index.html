@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Force Layout with labels on edges</title>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://localhost:8686/d3.v3.min.js" charset="utf-8"></script>
 <style type="text/css">
 </style>
 </head>
@@ -33,8 +33,13 @@ var dataset = {
   edges: [{
     source: 0,
     target: 1
+  },{
+    source: 2,
+    target: 1
   }],
   methlbl: [{
+    name: "add(int, int)"
+  },{
     name: "add(int, int)"
   }]
 };
@@ -123,7 +128,7 @@ edgelabels.append("textPath")
     return dataset.methlbl[i].name
   });
 
-/*
+
 svg.append('defs').append('marker')
   .attr({
     'id': 'arrowhead',
@@ -139,7 +144,7 @@ svg.append('defs').append('marker')
   .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
   .attr('fill', '#ccc')
   .attr('stroke', '#ccc');
-*/
+
 
 force.on("tick", function() {
 
