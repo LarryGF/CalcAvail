@@ -1,7 +1,6 @@
 <template>
   <v-layout column>
-    <Dialog :dialog="dialog" @close="dialog=false"/>
-
+    <Dialog :dialog="dialog" :states="graph.nodes" @close="dialog=false" @save="add_transition"/>
     <v-flex xs12>
       <div class="svg-container" :style="{width: settings.width + '%' }">
         <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
@@ -43,10 +42,10 @@
             style="pointer-events: none;"
           >
             <textPath
-              stroke="yellow"
-              stroke-width="5"
+              stroke="white"
+              stroke-width="1.5"
               :href="'#edge' + index"
-              startOffset="44.5"
+              startOffset="42%"
             >{{item.text}}</textPath>
           </text>
         </svg>
@@ -76,38 +75,38 @@ export default {
       viewBox: "0 0 960 600",
       graph: {
         nodes: [
-          {
-            id: "Alice",
-            x: 10.0,
-            y: 10.0
-          },
-          {
-            id: "Bob",
-            x: 200.0,
-            y: 200.0
-          },
-          {
-            id: "Carol",
-            x: 300.0,
-            y: 300.0
-          }
+          // {
+          //   id: "Alice",
+          //   x: 10.0,
+          //   y: 10.0
+          // },
+          // {
+          //   id: "Bob",
+          //   x: 200.0,
+          //   y: 200.0
+          // },
+          // {
+          //   id: "Carol",
+          //   x: 300.0,
+          //   y: 300.0
+          // }
         ],
         links: [
-          {
-            source: 1,
-            target: 1,
-            text: "la polla"
-          },
-          {
-            source: 1,
-            target: 2,
-            text: "lacebolla"
-          },
-          {
-            source: 1,
-            target: 2,
-            text: "lacebolla"
-          }
+          // {
+          //   source: 1,
+          //   target: 1,
+          //   text: "0.5"
+          // },
+          // {
+          //   source: 1,
+          //   target: 2,
+          //   text: "0.6"
+          // },
+          // {
+          //   source: 2,
+          //   target: 1,
+          //   text: "0.45"
+          // }
         ]
       },
       simulation: null,
@@ -163,6 +162,31 @@ export default {
       });
       this.stateNumber++;
       this.run_simulation();
+    },
+    add_transition: function(data) {
+      this.dialog = false
+      for (var node in this.graph.nodes) {
+        console.log(node);
+        if (this.graph.nodes[node].id === data.fromState) {
+          data.fromState = this.graph.nodes[node];
+        } else if (this.graph.nodes[node].id === data.toState) {
+          data.toState = this.graph.nodes[node];
+        }
+      }
+      console.log("index");
+      console.log(this.graph.nodes.indexOf(data.fromState));
+      this.graph.links.push({
+        source: this.graph.nodes.indexOf(data.fromState),
+        target: this.graph.nodes.indexOf(data.toState),
+        text: parseFloat(data.rate)
+      });
+      // this.graph.links.push({
+      //   source: 1,
+      //   target: 1,
+      //   text: "0.5"
+      // });
+      this.run_simulation();
+
     },
     d: function(source, target) {
       console.log("Source: ");
