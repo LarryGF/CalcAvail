@@ -16,10 +16,10 @@ x.add_node(n4)
 
 
 n1.add_path(n2, 2.5)
-n1.add_path(n3, 123)
+n1.add_path(n3, 1.3)
 n2.add_path(n1, 3.4)
-n2.add_path(n3, 49.87)
-n3.add_path(n1, 1.999923)
+n2.add_path(n3, 1.87)
+n3.add_path(n1, 1.999)
 n3.add_path(n2, 4.78)
 n4.add_path(n1, 1.99)
 

@@ -15,7 +15,7 @@
           <path
             fill="none"
             stroke="yellow"
-            stroke-width="5"
+            :stroke-width="parseFloat(item.text)"
             v-for="(item, index) in graph.links"
             :key="'line'+index"
             :d="d(item.source, item.target)"
@@ -35,7 +35,7 @@
             v-for="(item, index) in graph.nodes"
             stroke="black"
             :x="item.x -8"
-            :y="item.y -4"
+            :y="item.y +3"
             :key="'label' + index"
             class="nodelabel"
           >{{item.id}}</text>
@@ -48,6 +48,7 @@
             font-size="20"
             fill="#aaa"
             style="pointer-events: none;"
+            dy="-10"
           >
             <textPath
               stroke="white"
@@ -175,6 +176,9 @@ export default {
     tick: function() {
       for (let i = 0; i < this.graph.nodes.length; i++) {
         const element = this.graph.nodes[i];
+        if (isNaN(element.x ) || isNaN(element.y)){
+          console.log(element)
+        }
         if (element.x < 0) {
           element.x = 0 + 15;
         }
@@ -182,16 +186,16 @@ export default {
           element.y = 0 + 15;
         }
         if (element.x > this.settings.svgWigth) {
-          element.x = this.svgWigth - 15;
+          element.x = 900;
         }
         if (element.y > this.settings.svgHeight) {
-          element.y = this.svgHeight - 15;
+          element.y = 600;
         }
       }
     },
     run_simulation: function() {
       var that = this;
-
+      
       that.simulation = d3
         .forceSimulation(that.graph.nodes)
         .on("tick", this.tick)
@@ -199,7 +203,7 @@ export default {
           "link",
           d3
             .forceLink(that.graph.links)
-            // .distance(200)
+            .distance(200)
             .strength(0.01)
         )
         .force(
@@ -210,6 +214,7 @@ export default {
           )
         )
         .force("collision", d3.forceCollide().radius(100));
+        
       // .force(
       //   "charge",
       //   d3
@@ -230,6 +235,7 @@ export default {
       //   .start();
     },
     add_node: function() {
+      // this.simulation.stop()
       this.graph.nodes.push({
         id: "S" + String(this.stateNumber),
         x: Math.random() * this.settings.svgWigth,
@@ -239,6 +245,7 @@ export default {
       });
       this.stateNumber++;
       this.run_simulation();
+      // this.simulation.restart()
     },
     add_transition: function(data) {
       this.dialog = false;
