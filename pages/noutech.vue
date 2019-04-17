@@ -1,6 +1,14 @@
 <template>
   <v-layout column>
     <Dialog :dialog="dialog" :states="graph.nodes" @close="dialog=false" @save="add_transition"/>
+    <DeleteDialog
+      :delete_dialog="delete_dialog"
+      :items="items_to_delete"
+      :selected="delete_title"
+      @close="delete_dialog=false"
+      @delete="delete_element"
+    />
+
     <v-flex xs12>
       <div class="svg-container" :style="{width: settings.width + '%' }">
         <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
@@ -56,6 +64,8 @@
         <v-spacer></v-spacer>
         <v-btn @click="add_node">Add Node</v-btn>
         <v-btn @click="dialog=true">Add transition</v-btn>
+        <v-btn @click="delete_dialog_prepare('node')">Delete node</v-btn>
+        <v-btn @click="delete_dialog_prepare('transition')">Delete transition</v-btn>
         <v-spacer></v-spacer>
       </v-layout>
     </v-flex>
@@ -65,11 +75,15 @@
 <script>
 import * as d3 from "d3";
 import Dialog from "../components/Dialog.vue";
+import DeleteDialog from "../components/Delete_dialog.vue";
 
 export default {
   data: function() {
     return {
       dialog: false,
+      delete_dialog: false,
+      items_to_delete: [],
+      delete_title: "",
       stateNumber: 0,
       simulation: null,
       viewBox: "0 0 960 600",
@@ -120,7 +134,8 @@ export default {
     };
   },
   components: {
-    Dialog
+    Dialog,
+    DeleteDialog
   },
   mounted: function() {
     this.viewBox =
@@ -164,18 +179,23 @@ export default {
       this.run_simulation();
     },
     add_transition: function(data) {
-      this.dialog = false
+      this.dialog = false;
       for (var node in this.graph.nodes) {
         console.log(node);
         if (this.graph.nodes[node].id === data.fromState) {
           data.fromState = this.graph.nodes[node];
+          if (this.graph.nodes[node].id === data.toState) {
+            data.toState = this.graph.nodes[node];
+          }
         } else if (this.graph.nodes[node].id === data.toState) {
           data.toState = this.graph.nodes[node];
+          if (this.graph.nodes[node].id === data.fromState) {
+            data.fromState = this.graph.nodes[node];
+          }
         }
       }
-      console.log("index");
-      console.log(this.graph.nodes.indexOf(data.fromState));
       this.graph.links.push({
+        id:data.fromState.id + '=>' + data.toState.id,
         source: this.graph.nodes.indexOf(data.fromState),
         target: this.graph.nodes.indexOf(data.toState),
         text: parseFloat(data.rate)
@@ -185,6 +205,51 @@ export default {
       //   target: 1,
       //   text: "0.5"
       // });
+      this.run_simulation();
+    },
+
+    delete_dialog_prepare: function(string) {
+      if (string === "transition") {
+        this.items_to_delete = this.graph.links;
+        this.delete_title = "transition";
+      } else if (string === "node") {
+        this.items_to_delete = this.graph.nodes;
+        this.delete_title = "node";
+      }
+
+      this.delete_dialog = true;
+    },
+
+    delete_element: function (data) {
+      this.delete_dialog = false
+      if (this.delete_title === "transition"){
+        this.delete_title = ""
+        for (var link in this.graph.links){
+          if (this.graph.links[link].id === data){
+            this.graph.links.splice(link,1)
+          }
+        }
+
+      }
+      else if (this.delete_title === "node"){
+        this.delete_title = ""
+        var links_to_delete = []
+        for (var node in this.graph.nodes) {
+        if (this.graph.nodes[node].id === data) {
+          this.graph.nodes.splice(node,1)
+          for (var link in this.graph.links){
+            console.log(this.graph.links[link])
+            if (this.graph.links[link].source.id === data || this.graph.links[link].target.id === data){
+              links_to_delete.push(link)
+            } 
+          }
+          for (var link in links_to_delete){
+              this.graph.links.splice(link,1)
+
+          }
+        }
+      }
+      }
       this.run_simulation();
 
     },
