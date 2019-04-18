@@ -135,6 +135,9 @@ export default {
   },
   mounted: function() {
     this.loadFromEel();
+    if (this.graph === {}){
+      this.createMarkov()
+    }
     this.viewBox =
       "0 0 " +
       String(window.innerWidth * 0.8) +
@@ -163,10 +166,9 @@ export default {
         json.nodes[node].vx = 0;
         json.nodes[node].vy = 0;
       }
-      console.log(json.links)
+      
       var m = json.links.map((j) => j.ratio).reduce((a,b) => Math.max(a,b))
-      console.log('m')
-      console.log(m)
+     
 
       for (var link in json.links) {
         json.links[link].text = json.links[link].ratio
