@@ -21,6 +21,7 @@
           <v-list-tile-content>
             <v-list-tile-title v-text="item.title"></v-list-tile-title>
           </v-list-tile-content>
+         
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -46,12 +47,12 @@
       </v-btn> -->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <!-- <v-btn
+   <v-btn
         icon
-        @click.stop="rightDrawer = !rightDrawer"
+        @click.stop="refresh"
       >
-        <v-icon>menu</v-icon>
-      </v-btn> -->
+        <v-icon>refresh</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-content>
       <v-container class="pb-1 pt-3">
@@ -95,6 +96,11 @@
         right: true,
         rightDrawer: false,
         title: 'Markovify'
+      }
+    },
+    methods: {
+      refresh: function () {
+        document.location.reload()
       }
     }
   }
