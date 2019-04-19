@@ -45,7 +45,7 @@ class MarkovChain:
     def __init__(self, chainid):
         self.nodes: List[Node] = []
         self.chainid = chainid
-        self.nodelist = None
+        self.nodelist = []
 
     def add_node(self, node: Node):
         self.nodes.append(node)
@@ -139,7 +139,8 @@ class MarkovChain:
                     'target': pos[link.nodeid],
                     'ratio': value
                 } for node in self.nodes for link, value in node.outgoing.items()
-            ]
+            ],
+            'selected_states': self.nodelist
         }
 
 

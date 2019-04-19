@@ -80,7 +80,11 @@ def delete_node(data):
     else:
         return False
 
-
+@eel.expose
+def set_nodelist(nodelist):
+    current_chain.set_nodelist(nodelist)
+    return True
+    
 def get_node(nodeid):
     print(current_chain.chainid)
     for node in current_chain.nodes:

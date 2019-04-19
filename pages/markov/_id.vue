@@ -9,91 +9,25 @@
       @delete="delete_element"
     />
 
+    <SelectDialog
+      :select_dialog="select_dialog"
+      :items="graph.nodes"
+      :selected="selectedStates"
+      @close="select_dialog=false"
+      @select="selectStates"
+    />
+
     <v-flex xs12>
-      <div class="svg-container" :style="{width: settings.width + '%' }">
-        <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
-          <defs>
-            <marker
-              id="arrowhead"
-              viewBox="-0 -5 100 100"
-              refX="0"
-              refY="0"
-              orient="auto"
-              markerWidth="10%"
-              markerHeight="5%"
-              xoverflow="visible"
-              preserveAspectRatio="xMinYMin meet"
-            >
-              <path
-              d="M 0,-5 L 10 ,0 L 0,5"
-              fill= yellow
-              stroke= yellow
-              >
-
-              </path>
-            </marker>
-          </defs>
-          
-
-          <path
-            fill="none"
-            stroke="yellow"
-            v-for="(item, index) in graph.links"
-            :stroke-width="item.width"
-            :key="'line'+index"
-            :d="d(item.source, item.target)"
-            :id="'edge' + index"
-            marker-mid="url(#arrowhead)"
-            pointer-events= none
-
-          ></path>
-          <circle
-            r="40"
-            v-for="(item, index) in graph.nodes"
-            :cx="item.x"
-            :cy="item.y"
-            :key="'circle' + index"
-            fill="#fff"
-          ></circle>
-
-          <text
-            v-for="(item, index) in graph.nodes"
-            stroke="black"
-            :x="item.x -8"
-            :y="item.y +3"
-            :key="'label' + index"
-            class="nodelabel"
-          >{{item.id}}</text>
-
-          <text
-            v-for="(item, index) in graph.links"
-            :key="'labeledge' + index"
-            class="edgelabel"
-            :id="'edgelabel' + index"
-            font-size="20"
-            fill="#aaa"
-            style="pointer-events: none;"
-            dy="-15"
-          >
-            <textPath
-              stroke="white"
-              stroke-width="1.5"
-              :href="'#edge' + index"
-              startOffset="47%"
-            >{{item.text}}</textPath>
-          </text>
-
-
-        </svg>
-      </div>
+      <MarkovChain :viewBox="viewBox" :settings="settings" :graph="graph"/>
     </v-flex>
     <v-flex xs12>
-      <v-layout row>
+      <v-layout row mt-1>
         <v-spacer></v-spacer>
-        <v-btn @click="addNode">Add Node</v-btn>
-        <v-btn @click="dialog=true">Add transition</v-btn>
-        <v-btn @click="delete_dialog_prepare('node')">Delete node</v-btn>
-        <v-btn @click="delete_dialog_prepare('transition')">Delete transition</v-btn>
+        <v-btn @click="addNode"><v-icon>add</v-icon> Add Node</v-btn>
+        <v-btn @click="dialog=true"><v-icon>add</v-icon> Add transition</v-btn>
+        <v-btn @click="select_dialog=true"><v-icon></v-icon> Select nodes</v-btn>
+        <v-btn color="red" @click="delete_dialog_prepare('node')"><v-icon>delete</v-icon>Delete node</v-btn>
+        <v-btn color="red" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn>
         <v-spacer></v-spacer>
       </v-layout>
     </v-flex>
@@ -104,12 +38,16 @@
 import * as d3 from "d3";
 import Dialog from "../../components/Dialog.vue";
 import DeleteDialog from "../../components/Delete_dialog.vue";
+import SelectDialog from "../../components/SelectDialog.vue"
+import MarkovChain from "../../components/MarkovChain.vue"
 
 export default {
   data: function() {
     return {
       dialog: false,
       delete_dialog: false,
+      select_dialog: false,
+      selectedStates: [],
       items_to_delete: [],
       delete_title: "",
       stateNumber: 0,
@@ -131,7 +69,9 @@ export default {
   },
   components: {
     Dialog,
-    DeleteDialog
+    DeleteDialog,
+    SelectDialog,
+    MarkovChain
   },
   mounted: function() {
     this.loadInitial();
@@ -150,6 +90,11 @@ export default {
       eel.get_initial_data(document.location.pathname)(a => {
         // console.log(a);
         this.graph = this.loadFromJson(a);
+        console.log(this.selectedStates)
+        console.log('bin')
+
+        this.selectStates(this.selectedStates)
+        
         this.run_simulation();
       });
     },
@@ -158,6 +103,10 @@ export default {
       eel.get_data()(a => {
         // console.log(a);
         this.graph = this.loadFromJson(a);
+        console.log(this.selectedStates)
+        console.log('bin')
+
+        this.selectStates(this.selectedStates)
         this.run_simulation();
       });
     },
@@ -169,6 +118,7 @@ export default {
         json.nodes[node].y = Math.random() * this.settings.svgHeight;
         json.nodes[node].vx = 0;
         json.nodes[node].vy = 0;
+        json.nodes[node].color = '#fff'
       }
       if (json.links.length > 0){
          m = json.links.map((j) => j.ratio).reduce((a,b) => Math.max(a,b))
@@ -183,6 +133,8 @@ export default {
         // json.links[link].id = json.links[link].source.id + '=>' + json.links[link].target.id
 
       }
+
+      this.selectedStates = json.selected_states
 
       return json;
     },
@@ -229,24 +181,7 @@ export default {
         )
         .force("collision", d3.forceCollide().radius(100));
 
-      // .force(
-      //   "charge",
-      //   d3
-      //     .forceManyBody()
-      //     .strength(-300)
-      //     .distanceMin(200)
-      // )
-
-      // d3.layout
-      //   .force()
-      //   .nodes(dataset.nodes)
-      //   .links(dataset.edges)
-      //   .size([w, h])
-      //   .linkDistance([linkDistance])
-      //   .charge([-500])
-      //   .theta(0.1)
-      //   .gravity(0.05)
-      //   .start();
+    
     },
     addNode: async function() {
       eel.add_node("S" + String(this.stateNumber))((result) => console.log(result))
@@ -256,28 +191,7 @@ export default {
     },
     addTransition: function(data) {
       this.dialog = false;
-      // for (var node in this.graph.nodes) {
-      //   console.log(node);
-      //   if (this.graph.nodes[node].id === data.fromState) {
-      //     data.fromState = this.graph.nodes[node];
-      //     if (this.graph.nodes[node].id === data.toState) {
-      //       data.toState = this.graph.nodes[node];
-      //     }
-      //   } else if (this.graph.nodes[node].id === data.toState) {
-      //     data.toState = this.graph.nodes[node];
-      //     if (this.graph.nodes[node].id === data.fromState) {
-      //       data.fromState = this.graph.nodes[node];
-      //     }
-      //   }
-      // }
-      // this.graph.links.push({
-      //   id: data.fromState.id + "=>" + data.toState.id,
-      //   source: this.graph.nodes.indexOf(data.fromState),
-      //   target: this.graph.nodes.indexOf(data.toState),
-      //   text: parseFloat(data.rate)
-      // });
       eel.add_transition(data.fromState,data.toState,data.rate)((result) => console.log(result))
-      // this.run_simulation();
       this.getData()
     },
 
@@ -303,111 +217,28 @@ export default {
         this.delete_title = "";
         eel.delete_transition(data)((result) => console.log(result))
       } else if (this.delete_title === "node") {
-        // this.delete_title = "";
-        // var links_to_delete = [];
-        // for (var node in this.graph.nodes) {
-        //   if (this.graph.nodes[node].id === data) {
-        //     this.graph.nodes.splice(node, 1);
-        //     for (var link in this.graph.links) {
-        //       console.log(this.graph.links[link]);
-        //       if (
-        //         this.graph.links[link].source.id === data ||
-        //         this.graph.links[link].target.id === data
-        //       ) {
-        //         links_to_delete.push(link);
-        //       }
-        //     }
-        //     for (var link in links_to_delete) {
-        //       this.graph.links.splice(link, 1);
-        //     }
-        //   }
-        // }
         eel.delete_node(data)((result) => console.log(result))
       }
-      // this.run_simulation();
         this.getData()
 
     },
-    d: function(source, target) {
-      // console.log("Source: ");
-      // console.log(source);
-      //   source = this.graph.nodes[source];
-      //   target = this.graph.nodes[target];
-      // console.log(source);
-      // console.log("Target: ");
 
-      // console.log(target);
-      var x1 = source.x,
-        y1 = source.y,
-        x2 = target.x,
-        y2 = target.y,
-        dx = x2 - x1,
-        dy = y2 - y1,
-        ff;
+    selectStates: function(data) {
+      console.log('here')
+        for (var state in this.graph.nodes){
+          for (var selectedState in data){
+            if (this.graph.nodes[state].id === data[selectedState]){
+              
+              this.graph.nodes[state].color = 'yellow'
+            }
+          }
+        }
+        this.select_dialog = false
+        this.selectedStates = data
+        eel.set_nodelist(this.selectedStates)((result) => console.log(result))
 
-      if (isNaN(source.x) || isNaN(target.x)) {
-        x1 = 0;
-        x2 = 100;
-        dx = 100;
-      }
-      if (isNaN(source.y) || isNaN(target.y)) {
-        y1 = 0;
-        y2 = 100;
-        dy = 100;
-      }
-      // console.log(Math);
-      // console.log(Math.sqrt(dx * dx + dy * dy));
-      var dr = Math.sqrt(dx * dx + dy * dy),
-        // Defaults for normal edge.
-        drx = dr,
-        dry = dr,
-        xRotation = 0, // degrees
-        largeArc = 0, // 1 or 0
-        sweep = 1; // 1 or 0
-
-      // Self edge.
-      if (x1 === x2 && y1 === y2) {
-        // Fiddle with this angle to get loop oriented.
-        xRotation = -45;
-
-        // Needs to be 1.
-        largeArc = 1;
-
-        // Change sweep to change orientation of loop.
-        //sweep = 0;
-
-        // Make drx and dry different to get an ellipse
-        // instead of a circle.
-        drx = 30;
-        dry = 20;
-
-        // For whatever reason the arc collapses to a point if the beginning
-        // and ending points of the arc are the same, so kludge it.
-        x2 = x2 + 1;
-        y2 = y2 + 1;
-      }
-
-      return (
-        "M" +
-        x1 +
-        "," +
-        y1 +
-        "A" +
-        drx +
-        "," +
-        dry +
-        " " +
-        xRotation +
-        "," +
-        largeArc +
-        "," +
-        sweep +
-        " " +
-        x2 +
-        "," +
-        y2
-      );
     }
+    
   }
 };
 </script>
