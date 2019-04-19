@@ -303,11 +303,13 @@ export default {
       this.delete_dialog = false;
       if (this.delete_title === "transition") {
         this.delete_title = "";
-        for (var link in this.graph.links) {
-          if (this.graph.links[link].id === data) {
-            this.graph.links.splice(link, 1);
-          }
-        }
+        // for (var link in this.graph.links) {
+        //   if (this.graph.links[link].id === data) {
+        //     this.graph.links.splice(link, 1);
+        //   }
+        // }
+        eel.delete_transition(data)((result) => console.log(result))
+        this.getData()
       } else if (this.delete_title === "node") {
         this.delete_title = "";
         var links_to_delete = [];

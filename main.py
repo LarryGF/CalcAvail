@@ -62,6 +62,14 @@ def add_transition(from_node, to_node, ratio):
     from_node.add_path(to_node,float(ratio))
     return True
 
+@eel.expose
+def delete_transition(data):
+    nodes = data.split('=>')
+    print(nodes)
+    node = get_node(nodes[0])
+    to_delete = get_node(nodes[1])
+    node.del_path(to_delete)
+    return True
 def get_node(nodeid):
     print(current_chain.chainid)
     for node in current_chain.nodes:
@@ -69,6 +77,7 @@ def get_node(nodeid):
             return node
     
     return False
+
 
 if __name__ == "__main__":
     eel.start('index.html', options={'port': 8686})
