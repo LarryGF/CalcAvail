@@ -70,6 +70,17 @@ def delete_transition(data):
     to_delete = get_node(nodes[1])
     node.del_path(to_delete)
     return True
+
+@eel.expose
+def delete_node(data):
+    node = get_node(data)
+    if node:
+        current_chain.del_node(node)
+        return True
+    else:
+        return False
+
+
 def get_node(nodeid):
     print(current_chain.chainid)
     for node in current_chain.nodes:

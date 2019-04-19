@@ -170,7 +170,7 @@ export default {
         json.nodes[node].vx = 0;
         json.nodes[node].vy = 0;
       }
-      if (json.links.length > 2){
+      if (json.links.length > 0){
          m = json.links.map((j) => j.ratio).reduce((a,b) => Math.max(a,b))
 
       } 
@@ -179,12 +179,10 @@ export default {
       for (var link in json.links) {
         json.links[link].text = json.links[link].ratio
         json.links[link].width = (json.links[link].ratio / m) *3 + 2
-        console.log('this ')
         // console.log(json.links[json.links[link].source])
         // json.links[link].id = json.links[link].source.id + '=>' + json.links[link].target.id
 
       }
-      // console.log(json)
 
       return json;
     },
@@ -303,35 +301,32 @@ export default {
       this.delete_dialog = false;
       if (this.delete_title === "transition") {
         this.delete_title = "";
-        // for (var link in this.graph.links) {
-        //   if (this.graph.links[link].id === data) {
-        //     this.graph.links.splice(link, 1);
+        eel.delete_transition(data)((result) => console.log(result))
+      } else if (this.delete_title === "node") {
+        // this.delete_title = "";
+        // var links_to_delete = [];
+        // for (var node in this.graph.nodes) {
+        //   if (this.graph.nodes[node].id === data) {
+        //     this.graph.nodes.splice(node, 1);
+        //     for (var link in this.graph.links) {
+        //       console.log(this.graph.links[link]);
+        //       if (
+        //         this.graph.links[link].source.id === data ||
+        //         this.graph.links[link].target.id === data
+        //       ) {
+        //         links_to_delete.push(link);
+        //       }
+        //     }
+        //     for (var link in links_to_delete) {
+        //       this.graph.links.splice(link, 1);
+        //     }
         //   }
         // }
-        eel.delete_transition(data)((result) => console.log(result))
-        this.getData()
-      } else if (this.delete_title === "node") {
-        this.delete_title = "";
-        var links_to_delete = [];
-        for (var node in this.graph.nodes) {
-          if (this.graph.nodes[node].id === data) {
-            this.graph.nodes.splice(node, 1);
-            for (var link in this.graph.links) {
-              console.log(this.graph.links[link]);
-              if (
-                this.graph.links[link].source.id === data ||
-                this.graph.links[link].target.id === data
-              ) {
-                links_to_delete.push(link);
-              }
-            }
-            for (var link in links_to_delete) {
-              this.graph.links.splice(link, 1);
-            }
-          }
-        }
+        eel.delete_node(data)((result) => console.log(result))
       }
-      this.run_simulation();
+      // this.run_simulation();
+        this.getData()
+
     },
     d: function(source, target) {
       // console.log("Source: ");
