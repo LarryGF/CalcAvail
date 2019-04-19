@@ -1,6 +1,6 @@
 <template>
   <v-layout column>
-    <Dialog :dialog="dialog" :states="graph.nodes" @close="dialog=false" @save="add_transition"/>
+    <Dialog :dialog="dialog" :states="graph.nodes" @close="dialog=false" @save="addTransition"/>
     <DeleteDialog
       :delete_dialog="delete_dialog"
       :items="items_to_delete"
@@ -179,6 +179,9 @@ export default {
       for (var link in json.links) {
         json.links[link].text = json.links[link].ratio
         json.links[link].width = (json.links[link].ratio / m) *3 + 2
+        console.log('this ')
+        // console.log(json.links[json.links[link].source])
+        // json.links[link].id = json.links[link].source.id + '=>' + json.links[link].target.id
 
       }
       // console.log(json)
@@ -248,51 +251,45 @@ export default {
       //   .start();
     },
     addNode: async function() {
-      // this.graph.nodes.push({
-      //   id: "S" + String(this.stateNumber),
-      //   x: Math.random() * this.settings.svgWigth,
-      //   y: Math.random() * this.settings.svgHeight,
-      //   vx: 0,
-      //   vy: 0
-      // });
       eel.add_node("S" + String(this.stateNumber))((result) => console.log(result))
       this.stateNumber++;
       this.getData()
       // this.run_simulation();
     },
-    add_transition: function(data) {
+    addTransition: function(data) {
       this.dialog = false;
-      for (var node in this.graph.nodes) {
-        console.log(node);
-        if (this.graph.nodes[node].id === data.fromState) {
-          data.fromState = this.graph.nodes[node];
-          if (this.graph.nodes[node].id === data.toState) {
-            data.toState = this.graph.nodes[node];
-          }
-        } else if (this.graph.nodes[node].id === data.toState) {
-          data.toState = this.graph.nodes[node];
-          if (this.graph.nodes[node].id === data.fromState) {
-            data.fromState = this.graph.nodes[node];
-          }
-        }
-      }
-      this.graph.links.push({
-        id: data.fromState.id + "=>" + data.toState.id,
-        source: this.graph.nodes.indexOf(data.fromState),
-        target: this.graph.nodes.indexOf(data.toState),
-        text: parseFloat(data.rate)
-      });
+      // for (var node in this.graph.nodes) {
+      //   console.log(node);
+      //   if (this.graph.nodes[node].id === data.fromState) {
+      //     data.fromState = this.graph.nodes[node];
+      //     if (this.graph.nodes[node].id === data.toState) {
+      //       data.toState = this.graph.nodes[node];
+      //     }
+      //   } else if (this.graph.nodes[node].id === data.toState) {
+      //     data.toState = this.graph.nodes[node];
+      //     if (this.graph.nodes[node].id === data.fromState) {
+      //       data.fromState = this.graph.nodes[node];
+      //     }
+      //   }
+      // }
       // this.graph.links.push({
-      //   source: 1,
-      //   target: 1,
-      //   text: "0.5"
+      //   id: data.fromState.id + "=>" + data.toState.id,
+      //   source: this.graph.nodes.indexOf(data.fromState),
+      //   target: this.graph.nodes.indexOf(data.toState),
+      //   text: parseFloat(data.rate)
       // });
-      this.run_simulation();
+      eel.add_transition(data.fromState,data.toState,data.rate)((result) => console.log(result))
+      // this.run_simulation();
+      this.getData()
     },
 
     delete_dialog_prepare: function(string) {
       if (string === "transition") {
+        for (var link in this.graph.links){
+          this.graph.links[link].id = this.graph.links[link].source.id + "=>" + this.graph.links[link].target.id
+        }
         this.items_to_delete = this.graph.links;
+        
         this.delete_title = "transition";
       } else if (string === "node") {
         this.items_to_delete = this.graph.nodes;

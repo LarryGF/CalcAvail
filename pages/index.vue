@@ -20,9 +20,15 @@
 
 <script>
 export default {
+  data: function () {
+    return {
+
+    }
+  },
   methods: {
     createChain: async function () {
       eel.create_chain()((result) =>this.$router.push('/markov/'+ result)  )
+      
       
     }
   }
