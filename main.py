@@ -1,30 +1,28 @@
 import eel
+import random
 from availabilipy.classes import *
 
-x = MarkovChain('tu madre')
+persistent_data = {
+    'chains': {},
+    'rbd': {}
 
+}
 
-n1 = Node('n1')
-n2 = Node('n2')
-# n3 = Node('n3')
-# n4 = Node('n4')
-x.add_node(n1)
-x.add_node(n2)
-# x.add_node(n3)
-# x.add_node(n4)
-
-
-
-n1.add_path(n2, 2.5)
-# n1.add_path(n3, 1.3)
-# n2.add_path(n1, 3.4)
-# n2.add_path(n3, 1.87)
-# n3.add_path(n1, 1.999)
-# n3.add_path(n2, 4.78)
-# n4.add_path(n1, 1.99)
 
 
 eel.init('dist')
+
+
+@eel.expose
+def create_chain():
+    global current_chain
+    chainid = str(random.randint(1, 10000))
+    while chainid in persistent_data['chains'].keys():
+        chainid = str(random.randint(1, 2))
+    x = MarkovChain(chainid)
+    persistent_data['chains'][chainid] = x
+    current_chain = x
+    return chainid
 
 
 @eel.expose
@@ -32,14 +30,25 @@ def hello():
     print('fatso')
     return 'hello fat'
 
-@eel.expose
-def data():
-    if x:
-        return x.to_json()
-    else:
-        return {
-            nodes: [],
-            links: []
-        }
 
-eel.start('index.html', options={'port': 8686})
+@eel.expose
+def get_initial_data(route):
+    current_chain = persistent_data['chains'][route.split('/markov/')[1]]
+    x = current_chain.to_json()
+    print(type(current_chain))
+
+    return x 
+
+
+@eel.expose
+def get_data():
+    return current_chain.to_json()
+
+@eel.expose
+def add_node(name):
+    current_chain.add_node(Node(name))
+    return True
+
+
+if __name__ == "__main__":
+    eel.start('index.html', options={'port': 8686})

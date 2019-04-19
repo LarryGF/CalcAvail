@@ -90,7 +90,7 @@
     <v-flex xs12>
       <v-layout row>
         <v-spacer></v-spacer>
-        <v-btn @click="add_node">Add Node</v-btn>
+        <v-btn @click="addNode">Add Node</v-btn>
         <v-btn @click="dialog=true">Add transition</v-btn>
         <v-btn @click="delete_dialog_prepare('node')">Delete node</v-btn>
         <v-btn @click="delete_dialog_prepare('transition')">Delete transition</v-btn>
@@ -102,8 +102,8 @@
 
 <script>
 import * as d3 from "d3";
-import Dialog from "../components/Dialog.vue";
-import DeleteDialog from "../components/Delete_dialog.vue";
+import Dialog from "../../components/Dialog.vue";
+import DeleteDialog from "../../components/Delete_dialog.vue";
 
 export default {
   data: function() {
@@ -134,10 +134,7 @@ export default {
     DeleteDialog
   },
   mounted: function() {
-    this.loadFromEel();
-    if (this.graph === {}){
-      this.createMarkov()
-    }
+    this.loadInitial();
     this.viewBox =
       "0 0 " +
       String(window.innerWidth * 0.8) +
@@ -148,26 +145,35 @@ export default {
     this.run_simulation();
   },
   methods: {
-    loadFromEel: function() {
+    loadInitial: function() {
       let that = this;
-      // var result = null
-      eel.data()(a => {
+      eel.get_initial_data(document.location.pathname)(a => {
         // console.log(a);
         this.graph = this.loadFromJson(a);
         this.run_simulation();
-        console.log(this.graph);
+      });
+    },
+
+    getData: async function () {
+      eel.get_data()(a => {
+        // console.log(a);
+        this.graph = this.loadFromJson(a);
+        this.run_simulation();
       });
     },
 
     loadFromJson: function(json) {
+      var m = 1
       for (var node in json.nodes) {
         json.nodes[node].x = Math.random() * this.settings.svgWigth;
         json.nodes[node].y = Math.random() * this.settings.svgHeight;
         json.nodes[node].vx = 0;
         json.nodes[node].vy = 0;
       }
-      
-      var m = json.links.map((j) => j.ratio).reduce((a,b) => Math.max(a,b))
+      if (json.links.length > 2){
+         m = json.links.map((j) => j.ratio).reduce((a,b) => Math.max(a,b))
+
+      } 
      
 
       for (var link in json.links) {
@@ -241,18 +247,18 @@ export default {
       //   .gravity(0.05)
       //   .start();
     },
-    add_node: function() {
-      // this.simulation.stop()
-      this.graph.nodes.push({
-        id: "S" + String(this.stateNumber),
-        x: Math.random() * this.settings.svgWigth,
-        y: Math.random() * this.settings.svgHeight,
-        vx: 0,
-        vy: 0
-      });
+    addNode: async function() {
+      // this.graph.nodes.push({
+      //   id: "S" + String(this.stateNumber),
+      //   x: Math.random() * this.settings.svgWigth,
+      //   y: Math.random() * this.settings.svgHeight,
+      //   vx: 0,
+      //   vy: 0
+      // });
+      eel.add_node("S" + String(this.stateNumber))((result) => console.log(result))
       this.stateNumber++;
-      this.run_simulation();
-      // this.simulation.restart()
+      this.getData()
+      // this.run_simulation();
     },
     add_transition: function(data) {
       this.dialog = false;
