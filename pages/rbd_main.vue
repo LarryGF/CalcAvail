@@ -18,7 +18,7 @@
     />
 
     <v-flex xs12>
-      <MarkovChain :viewBox="viewBox" :settings="settings" :graph="graph"/>
+      <RBD :viewBox="viewBox" :settings="settings" :graph="graph"/>
     </v-flex>
     <v-flex xs12>
       <v-layout row mt-1>
@@ -38,10 +38,10 @@
 
 <script>
 import * as d3 from "d3";
-import Dialog from "../../components/Dialog.vue";
-import DeleteDialog from "../../components/Delete_dialog.vue";
-import SelectDialog from "../../components/SelectDialog.vue"
-import MarkovChain from "../../components/MarkovChain.vue"
+import Dialog from "../components/Dialog.vue";
+import DeleteDialog from "../components/Delete_dialog.vue";
+import SelectDialog from "../components/SelectDialog.vue"
+import RBD from "../components/RBD.vue"
 
 export default {
   data: function() {
@@ -58,6 +58,30 @@ export default {
       viewBox: "0 0 960 600",
       graph: {
         nodes: [
+          {
+            id:1,
+            x:100,
+            y:100
+
+          },
+          {
+            id:2,
+            x:100,
+            y:100
+
+          },
+          {
+            id:3,
+            x:100,
+            y:100
+
+          }
+        ],
+        links:[
+          {
+            source:0,
+            target:1
+          }
         ]
       },
       simulation: null,
@@ -74,10 +98,10 @@ export default {
     Dialog,
     DeleteDialog,
     SelectDialog,
-    MarkovChain
+    RBD
   },
   mounted: function() {
-    this.loadInitial();
+    // this.loadInitial();
     this.viewBox =
       "0 0 " +
       String(window.innerWidth * 0.8) +
@@ -180,8 +204,9 @@ export default {
           )
         )
         .force("collision", d3.forceCollide().radius(100))
-        .force('forceY',
-        d3.forceY());
+        .force("forceY",
+        d3.forceY()
+        );
 
     
     },
