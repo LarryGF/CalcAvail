@@ -22,10 +22,11 @@
     </v-flex>
     <v-flex xs12>
       <v-layout row mt-1>
+        <v-btn color="green">Solve chain</v-btn>
         <v-spacer></v-spacer>
         <v-btn @click="addNode"><v-icon>add</v-icon> Add Node</v-btn>
         <v-btn @click="dialog=true"><v-icon>add</v-icon> Add transition</v-btn>
-        <v-btn @click="select_dialog=true"><v-icon></v-icon> Select nodes</v-btn>
+        <v-btn color="blue" @click="select_dialog=true"><v-icon>check</v-icon> Select nodes</v-btn>
         <v-btn color="red" @click="delete_dialog_prepare('node')"><v-icon>delete</v-icon>Delete node</v-btn>
         <v-btn color="red" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn>
         <v-spacer></v-spacer>
@@ -101,7 +102,6 @@ export default {
 
     getData: async function () {
       eel.get_data()(a => {
-        // console.log(a);
         this.graph = this.loadFromJson(a);
         console.log(this.selectedStates)
         console.log('bin')
@@ -129,9 +129,7 @@ export default {
       for (var link in json.links) {
         json.links[link].text = json.links[link].ratio
         json.links[link].width = (json.links[link].ratio / m) *3 + 2
-        // console.log(json.links[json.links[link].source])
-        // json.links[link].id = json.links[link].source.id + '=>' + json.links[link].target.id
-
+       
       }
 
       this.selectedStates = json.selected_states
@@ -226,12 +224,17 @@ export default {
     selectStates: function(data) {
       console.log('here')
         for (var state in this.graph.nodes){
-          for (var selectedState in data){
-            if (this.graph.nodes[state].id === data[selectedState]){
-              
+          // for (var selectedState in data){
+            console.log(this.graph.nodes[state].id)
+            console.log(data)
+            if (data.includes(this.graph.nodes[state].id)){
               this.graph.nodes[state].color = 'yellow'
+              console.log('check me')
+            } else{
+              this.graph.nodes[state].color = '#fff'
+
             }
-          }
+          // }
         }
         this.select_dialog = false
         this.selectedStates = data

@@ -9,20 +9,21 @@
         </v-card-title>
         <v-card-text>
           <v-container fluid >
-        <v-select
+        <v-autocomplete
           v-model="from"
           dense
           outline
           label = "From State"
           :items="stateIds"
-        ></v-select>
-        <v-select
+          autofocus
+        ></v-autocomplete>
+        <v-autocomplete
           v-model="to"
           dense
           label="To State"
           :items="stateIds"
           outline
-        ></v-select>
+        ></v-autocomplete>
       </v-container >
       
           <v-container fluid>
@@ -36,6 +37,10 @@
               counter
               maxlength="5"
               loading
+              mask="#.###"
+              return-masked-value
+              @keyup.enter.native="save"
+
             >
             <v-progress-linear slot="progress" :value="progress" :color="color" height="7"></v-progress-linear>
             </v-text-field>
@@ -65,6 +70,7 @@ export default {
     custom: true,
     from:'',
     to:'',
+    auto:false,
     rules: {
       required: value => !!value || 'Required'
     },

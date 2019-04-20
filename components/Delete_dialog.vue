@@ -10,13 +10,13 @@
         <v-card-text>
           <v-container fluid >
         
-        <v-select
+        <v-autocomplete
           v-model="item"
           dense
           :label="'Select '+ this.selected + ' to delete'"
           :items="stateIds"
           outline
-        ></v-select>
+        ></v-autocomplete>
       </v-container >
       
           
