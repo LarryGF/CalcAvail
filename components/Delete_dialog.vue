@@ -16,6 +16,8 @@
           :label="'Select '+ this.selected + ' to delete'"
           :items="stateIds"
           outline
+              @keyup.enter.native="delete_item"
+
         ></v-autocomplete>
       </v-container >
       

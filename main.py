@@ -83,8 +83,14 @@ def delete_node(data):
 @eel.expose
 def set_nodelist(nodelist):
     current_chain.set_nodelist(nodelist)
+    print(current_chain.nodelist)
     return True
-    
+
+@eel.expose
+def solve_chain():
+    result = current_chain.get_availability()
+    return result
+
 def get_node(nodeid):
     print(current_chain.chainid)
     for node in current_chain.nodes:

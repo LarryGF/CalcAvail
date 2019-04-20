@@ -1,6 +1,7 @@
 <template>
   <v-layout row justify-center>
-    <v-dialog v-model="dialog" persistent max-width="600px" dark>
+      
+    <v-dialog v-model="dialog" persistent max-width="600px" dark @onShow="$refs.first.focus()">
       <!-- <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn> -->
       <v-card>
         
@@ -10,19 +11,25 @@
         <v-card-text>
           <v-container fluid >
         <v-autocomplete
+        v-if="dialog"
           v-model="from"
           dense
           outline
           label = "From State"
           :items="stateIds"
           autofocus
+              @keyup.enter.native="$refs.second.focus()"
+
         ></v-autocomplete>
         <v-autocomplete
+          ref="second"
           v-model="to"
           dense
           label="To State"
           :items="stateIds"
           outline
+              @keyup.enter.native="$refs.third.focus()"
+
         ></v-autocomplete>
       </v-container >
       
@@ -30,6 +37,7 @@
             <!-- <v-layout > -->
             <!-- <v-flex xs12 sm6 md4> -->
             <v-text-field
+              ref="third"
               v-model="value"
               label="Transition rate"
               required
@@ -94,6 +102,10 @@ export default {
       this.from = ''
       this.to = ''
       this.$emit('save',data)
+    },
+    change_focus: function (data) {
+      
+      this.$refs.data.focus()
     }
   }
 }
