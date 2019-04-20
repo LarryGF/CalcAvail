@@ -89,7 +89,8 @@ def set_nodelist(nodelist):
 @eel.expose
 def solve_chain():
     result = current_chain.get_availability()
-    return result
+    
+    return round(result,4)
 
 def get_node(nodeid):
     print(current_chain.chainid)
