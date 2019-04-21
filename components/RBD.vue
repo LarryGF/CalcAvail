@@ -37,53 +37,51 @@
 
           ></path>
           <g
-            v-for="(item, index) in graph.paralel"
+            v-for="(item, index) in graph.nodes"
             :key="'rect' + index"
           >
 
           <rect
+            v-if="item.amount>1"
             width="100"
             height="200"
             rx="10" 
             ry="10"
             :x="item.x"
-            :y="item.y"
+            :y="item.y-70"
             fill="none"
             stroke="#fff"
           >
           </rect>
+          
           <rect
+            
             v-for="i in item.amount"
-            :key="i"
+            
+            :key="'small'+i"
             width="80"
             height="40"
             rx="10" 
             ry="10"
             :x="item.x+10"
-            :y="item.y-45+i*50"
+            :y="adjustRectHeight(item,i)"
             fill="yellow"
           >
           </rect>
+
+
           <text
             v-for="i in item.amount"
             :key="i"
             stroke="black"
             :x="item.x +43"
-            :y="item.y-20+i*50"
+            :y="adjustTextHeight(item,i)"
 
             class="nodelabel"
           >{{item.id}}.{{i}}</text>
           </g>
 
-          <!-- <text
-            v-for="(item, index) in graph.nodes"
-            stroke="black"
-            :x="item.x +50"
-            :y="item.y +35"
-            :key="'label' + index"
-            class="nodelabel"
-          >{{item.id}}</text> -->
-
+          
           <text
             v-for="(item, index) in graph.links"
             :key="'labeledge' + index"
@@ -125,6 +123,25 @@ export default {
   },
  
   methods: {
+    adjustRectHeight: function (item,i) {
+      if (item.amount >1){
+
+        return item.y-45+i*50-70
+      } else {
+        return item.y-45+i*50
+
+      }
+    },
+    adjustTextHeight: function (item,i) {
+      if (item.amount >1){
+
+        return item.y-20+i*50 -70
+      } else {
+        return item.y-20+i*50
+
+      }
+    },
+
     d: function(source, target) {
       var x1 = source.x,
         y1 = source.y + 30,
