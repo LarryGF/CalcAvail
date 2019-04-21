@@ -37,41 +37,52 @@
 
           ></path>
           <g
-            v-for="(item, index) in graph.nodes"
-          
+            v-for="(item, index) in graph.paralel"
             :key="'rect' + index"
           >
 
           <rect
             width="100"
-            height="70"
+            height="200"
             rx="10" 
             ry="10"
             :x="item.x"
             :y="item.y"
-            fill="#fff"
+            fill="none"
+            stroke="#fff"
           >
           </rect>
           <rect
-            width="50"
-            height="30"
+            v-for="i in item.amount"
+            :key="i"
+            width="80"
+            height="40"
             rx="10" 
             ry="10"
-            :x="item.x"
-            :y="item.y"
+            :x="item.x+10"
+            :y="item.y-45+i*50"
             fill="yellow"
           >
           </rect>
+          <text
+            v-for="i in item.amount"
+            :key="i"
+            stroke="black"
+            :x="item.x +43"
+            :y="item.y-20+i*50"
+
+            class="nodelabel"
+          >{{item.id}}.{{i}}</text>
           </g>
 
-          <text
+          <!-- <text
             v-for="(item, index) in graph.nodes"
             stroke="black"
             :x="item.x +50"
             :y="item.y +35"
             :key="'label' + index"
             class="nodelabel"
-          >{{item.id}}</text>
+          >{{item.id}}</text> -->
 
           <text
             v-for="(item, index) in graph.links"

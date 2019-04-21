@@ -57,6 +57,29 @@ export default {
       simulation: null,
       viewBox: "0 0 960 600",
       graph: {
+        paralel:[
+          {
+            id:3,
+            x:100,
+            y:100,
+            amount:4
+
+          },
+          {
+            id:2,
+            x:100,
+            y:100,
+            amount:3
+
+          },
+          {
+            id:1,
+            x:100,
+            y:100,
+            amount:2
+
+          }
+        ],
         nodes: [
           {
             id:1,
@@ -182,6 +205,25 @@ export default {
           element.y = 600;
         }
       }
+      for (let i = 0; i < this.graph.paralel.length; i++) {
+        const paralelElement = this.graph.paralel[i];
+        //pam pam pam pam, can't touch this
+        if (isNaN(paralelElement.x) || isNaN(paralelElement.y)) {
+          console.log(paralelElement);
+        }
+        if (paralelElement.x < 0) {
+          paralelElement.x = 0 + 15;
+        }
+        if (paralelElement.y < 0) {
+          paralelElement.y = 0 + 15;
+        }
+        if (paralelElement.x > this.settings.svgWigth) {
+          paralelElement.x = 900;
+        }
+        if (paralelElement.y > this.settings.svgHeight) {
+          paralelElement.y = 600;
+        }
+      }
     },
     run_simulation: function() {
       var that = this;
@@ -205,8 +247,30 @@ export default {
         )
         .force("collision", d3.forceCollide().radius(100))
         .force("forceY",
-        d3.forceY()
+        d3.forceY(700)
         );
+        that.simulation = d3
+        .forceSimulation(that.graph.paralel)
+        .on("tick", this.tick)
+        .force(
+          "link",
+          d3
+            .forceLink(that.graph.links)
+            .distance(200)
+            .strength(0.01)
+        )
+        .force(
+          "center",
+          d3.forceCenter(
+            that.settings.svgWigth / 2,
+            that.settings.svgHeight / 2
+          )
+        )
+        .force("collision", d3.forceCollide().radius(100))
+        .force("forceY",
+        d3.forceY()
+        )
+        ;
 
     
     },
