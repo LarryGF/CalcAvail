@@ -69,22 +69,53 @@ export default {
             id:2,
             x:100,
             y:100,
-            amount:3
+            amount:1
 
           },
           {
             id:3,
             x:100,
             y:100,
-            amount:1
+            amount:4
+
+          },
+          {
+            id:4,
+            x:100,
+            y:100,
+            amount:2
+
+          },
+          {
+            id:5,
+            x:100,
+            y:100,
+            amount:3
 
           }
         ],
         links:[
           {
+            id:0,
             source:0,
+            target:1
+          },
+          {
+            id:1,
+            source:1,
             target:2
-          }
+          },
+          {
+            id:2,
+            source:2,
+            target:3
+          },
+          {
+            id:3,
+            source:3,
+            target:4
+          },
+          
         ]
       },
       simulation: null,
@@ -198,29 +229,8 @@ export default {
           d3
             .forceLink(that.graph.links)
             .distance(200)
-            .strength(0.01)
+            // .strength(0.9)
         )
-        .force(
-          "center",
-          d3.forceCenter(
-            that.settings.svgWigth / 2,
-            that.settings.svgHeight / 2
-          )
-        )
-        .force("collision", d3.forceCollide().radius(100))
-        .force("forceY",
-        d3.forceY(700)
-        );
-        // that.simulation = d3
-        // .forceSimulation(that.graph.paralel)
-        // .on("tick", this.tick)
-        // // .force(
-        // //   "link",
-        // //   d3
-        // //     .forceLink(that.graph.links)
-        // //     .distance(200)
-        // //     .strength(0.01)
-        // // )
         // .force(
         //   "center",
         //   d3.forceCenter(
@@ -228,12 +238,34 @@ export default {
         //     that.settings.svgHeight / 2
         //   )
         // )
-        // .force("collision", d3.forceCollide().radius(100))
-        // .force("forceY",
-        // d3.forceY()
+        .force("collision", d3.forceCollide().radius(100))
+        // .force(
+        //   "manybody",
+        //   d3.forceManyBody().distanceMin(200).strength(-10)
         // )
-        // ;
 
+        .force("forceY",
+        d3.forceY(that.settings.svgHeight / 2)
+        )
+        // .force("forceX",
+        // d3.forceX(0)
+        // )
+       ;
+       that.simulation = d3.forceSimulation(that.graph.nodes[-1])
+       .on("tick",this.tick)
+       .force(
+          "link",
+          d3
+            .forceLink(that.graph.links)
+            .distance(200)
+            // .strength(0.9)
+        )
+       .force("forceX",
+        d3.forceX(0)
+        )
+        
+        ;
+        
     
     },
     addNode: async function() {

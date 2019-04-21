@@ -1,152 +1,142 @@
 <template>
-    <div class="svg-container" :style="{width: settings.width + '%' }">
-        <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
-          <defs>
-            <marker
-              id="arrowhead"
-              viewBox="-0 -5 100 100"
-              refX="0"
-              refY="0"
-              orient="auto"
-              markerWidth="10%"
-              markerHeight="5%"
-              xoverflow="visible"
-              preserveAspectRatio="xMinYMin meet"
-            >
-              <path
-              d="M 0,-5 L 10 ,0 L 0,5"
-              fill= yellow
-              stroke= yellow
-              >
+  <div class="svg-container" :style="{width: settings.width + '%' }">
+    <svg id="svg" pointer-events="all" :viewBox="viewBox" preserveAspectRatio="xMinYMin meet">
+      <defs>
+        <marker
+          id="arrowhead"
+          viewBox="-0 -5 100 100"
+          refX="0"
+          refY="0"
+          orient="auto"
+          markerWidth="10%"
+          markerHeight="5%"
+          xoverflow="visible"
+          preserveAspectRatio="xMinYMin meet"
+        >
+          <path d="M 0,-5 L 10 ,0 L 0,5" fill="yellow" stroke="yellow"></path>
+        </marker>
+      </defs>
 
-              </path>
-            </marker>
-          </defs>
-          
+      <path
+        fill="none"
+        stroke="yellow"
+        v-for="(item, index) in graph.links"
+        :stroke-width="item.width"
+        :key="'line'+index"
+        :d="d(item.source, item.target)"
+        :id="'edge' + index"
+        marker-mid="url(#arrowhead)"
+        pointer-events="none"
+      ></path>
 
-          <path
-            fill="none"
-            stroke="yellow"
-            v-for="(item, index) in graph.links"
-            :stroke-width="item.width"
-            :key="'line'+index"
-            :d="d(item.source, item.target)"
-            :id="'edge' + index"
-            marker-mid="url(#arrowhead)"
-            pointer-events= none
+      <g v-for="(item, index) in graph.nodes" :key="'rect' + index">
+        <rect
+          v-if="item.amount>1"
+          width="100"
+          height="200"
+          rx="10"
+          ry="10"
+          :x="item.x"
+          :y="item.y-70"
+          fill="none"
+          stroke="#fff"
+        ></rect>
 
-          ></path>
-          <g
-            v-for="(item, index) in graph.nodes"
-            :key="'rect' + index"
-          >
+        <rect
+          v-if="item.amount==1"
+          width="100"
+          height="50"
+          rx="10"
+          ry="10"
+          :x="item.x"
+          :y="item.y"
+          fill="none"
+          stroke="#fff"
+        ></rect>
 
-          <rect
-            v-if="item.amount>1"
-            width="100"
-            height="200"
-            rx="10" 
-            ry="10"
-            :x="item.x"
-            :y="item.y-70"
-            fill="none"
-            stroke="#fff"
-          >
-          </rect>
-          
-          <rect
-            
-            v-for="i in item.amount"
-            
-            :key="'small'+i"
-            width="80"
-            height="40"
-            rx="10" 
-            ry="10"
-            :x="item.x+10"
-            :y="adjustRectHeight(item,i)"
-            fill="yellow"
-          >
-          </rect>
+        <rect
+          v-for="i in item.amount"
+          :key="'small'+i"
+          width="80"
+          height="40"
+          rx="10"
+          ry="10"
+          :x="item.x+10"
+          :y="adjustRectHeight(item,i)"
+          fill="yellow"
+        ></rect>
 
+        <text
+          v-for="i in item.amount"
+          :key="i"
+          stroke="black"
+          :x="item.x +43"
+          :y="adjustTextHeight(item,i)"
+          class="nodelabel"
+        >{{item.id}}.{{i}}</text>
+      </g>
 
-          <text
-            v-for="i in item.amount"
-            :key="i"
-            stroke="black"
-            :x="item.x +43"
-            :y="adjustTextHeight(item,i)"
-
-            class="nodelabel"
-          >{{item.id}}.{{i}}</text>
-          </g>
-
-          
-          <text
-            v-for="(item, index) in graph.links"
-            :key="'labeledge' + index"
-            class="edgelabel"
-            :id="'edgelabel' + index"
-            font-size="20"
-            fill="#aaa"
-            style="pointer-events: none;"
-            dy="-15"
-          >
-            <textPath
-              stroke="white"
-              stroke-width="1.5"
-              :href="'#edge' + index"
-              startOffset="47%"
-            >{{item.text}}</textPath>
-          </text>
-
-
-        </svg>
-      </div>
+      <text
+        v-for="(item, index) in graph.links"
+        :key="'labeledge' + index"
+        class="edgelabel"
+        :id="'edgelabel' + index"
+        font-size="20"
+        fill="#aaa"
+        style="pointer-events: none;"
+        dy="-15"
+      >
+        <textPath
+          stroke="white"
+          stroke-width="1.5"
+          :href="'#edge' + index"
+          startOffset="47%"
+        >{{item.text}}</textPath>
+      </text>
+    </svg>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'RBD',
+  name: "RBD",
   props: {
     settings: Object,
     viewBox: String,
     graph: Object
-
   },
   data: () => ({
-      item: null,
+    item: null,
     stateIds: []
   }),
   watch: {
-    items: function () {this.stateIds = this.items.map((state) => state.id)}
+    items: function() {
+      this.stateIds = this.items.map(state => state.id);
+    }
   },
- 
+
   methods: {
-    adjustRectHeight: function (item,i) {
-      if (item.amount >1){
-
-        return item.y-45+i*50-70
+    adjustRectHeight: function(item, i) {
+      if (item.amount > 1) {
+        return item.y - 45 + i * 50 - 70;
       } else {
-        return item.y-45+i*50
-
+        return item.y - 45 + i * 50;
       }
     },
-    adjustTextHeight: function (item,i) {
-      if (item.amount >1){
-
-        return item.y-20+i*50 -70
+    adjustTextHeight: function(item, i) {
+      if (item.amount > 1) {
+        return item.y - 20 + i * 50 - 70;
       } else {
-        return item.y-20+i*50
-
+        return item.y - 20 + i * 50;
       }
     },
 
     d: function(source, target) {
-      var x1 = source.x,
+      
+      var x1 = source.x +100 ,
         y1 = source.y + 30,
-        x2 = target.x,
-        y2 = target.y +30,
+        x2 = target.x ,
+        y2 = target.y + 30,
         dx = x2 - x1,
         dy = y2 - y1,
         ff;
@@ -196,16 +186,16 @@ export default {
         x1 +
         "," +
         y1 +
-        "A" +
-        drx +
-        "," +
-        dry +
-        " " +
-        xRotation +
-        "," +
-        largeArc +
-        "," +
-        sweep +
+        // "A" +
+        // drx +
+        // "," +
+        // dry +
+        // " " +
+        // xRotation +
+        // "," +
+        // largeArc +
+        // "," +
+        // sweep +
         " " +
         x2 +
         "," +
@@ -213,5 +203,5 @@ export default {
       );
     }
   }
-}
+};
 </script>
