@@ -60,39 +60,102 @@ export default {
         nodes: [
           {
             id:1,
-            x:100,
+            x:0,
             y:100,
             amount:4
 
           },
           {
             id:2,
-            x:100,
+            x:0,
             y:100,
             amount:1
 
           },
           {
             id:3,
-            x:100,
+            x:0,
             y:100,
             amount:4
 
           },
           {
             id:4,
-            x:100,
+            x:0,
             y:100,
             amount:2
 
           },
           {
             id:5,
-            x:100,
+            x:0,
             y:100,
             amount:3
 
-          }
+          },
+          {
+            id:6,
+            x:0,
+            y:100,
+            amount:2
+
+          },
+          {
+            id:7,
+            x:0,
+            y:100,
+            amount:1
+
+          },
+          // {
+          //   id:8,
+          //   x:0,
+          //   y:100,
+          //   amount:4
+
+          // },
+          // {
+          //   id:9,
+          //   x:0,
+          //   y:100,
+          //   amount:1
+
+          // },
+          // {
+          //   id:10,
+          //   x:0,
+          //   y:100,
+          //   amount:2
+
+          // },
+          //  {
+          //   id:11,
+          //   x:0,
+          //   y:100,
+          //   amount:1
+
+          // },
+          // {
+          //   id:12,
+          //   x:0,
+          //   y:100,
+          //   amount:2
+
+          // },
+          // {
+          //   id:13,
+          //   x:0,
+          //   y:100,
+          //   amount:2
+
+          // },
+          // {
+          //   id:14,
+          //   x:0,
+          //   y:100,
+          //   amount:2
+
+          // }
         ],
         links:[
           {
@@ -115,6 +178,46 @@ export default {
             source:3,
             target:4
           },
+          {
+            id:4,
+            source:4,
+            target:5
+          },
+          // {
+          //   id:5,
+          //   source:5,
+          //   target:6
+          // },
+          // {
+          //   id:6,
+          //   source:6,
+          //   target:7
+          // },
+          // {
+          //   id:7,
+          //   source:7,
+          //   target:8
+          // },
+          // {
+          //   id:8,
+          //   source:8,
+          //   target:9
+          // },
+          // {
+          //   id:9,
+          //   source:10,
+          //   target:11
+          // },
+          // {
+          //   id:10,
+          //   source:11,
+          //   target:12
+          // },{
+          //   id:11,
+          //   source:12,
+          //   target:13
+          // },
+          
           
         ]
       },
@@ -220,6 +323,7 @@ export default {
     },
     run_simulation: function() {
       var that = this;
+        var increment = that.settings.svgWigth/that.graph.nodes.length
 
       that.simulation = d3
         .forceSimulation(that.graph.nodes )
@@ -228,8 +332,7 @@ export default {
           "link",
           d3
             .forceLink(that.graph.links)
-            .distance(200)
-            // .strength(0.9)
+            .distance(increment)
         )
         // .force(
         //   "center",
@@ -238,7 +341,10 @@ export default {
         //     that.settings.svgHeight / 2
         //   )
         // )
-        .force("collision", d3.forceCollide().radius(100))
+        // .force("collision", d3.forceCollide()
+        // // .strength(7.5)
+        // // .radius(90)
+        // )
         // .force(
         //   "manybody",
         //   d3.forceManyBody().distanceMin(200).strength(-10)
@@ -246,25 +352,34 @@ export default {
 
         .force("forceY",
         d3.forceY(that.settings.svgHeight / 2)
+        .strength(100)
         )
-        // .force("forceX",
-        // d3.forceX(0)
-        // )
        ;
-       that.simulation = d3.forceSimulation(that.graph.nodes[-1])
-       .on("tick",this.tick)
-       .force(
-          "link",
-          d3
-            .forceLink(that.graph.links)
-            .distance(200)
-            // .strength(0.9)
-        )
-       .force("forceX",
-        d3.forceX(0)
-        )
+      //  that.simulation = d3.forceSimulation(that.graph.nodes[-1])
+      //  .on("tick",this.tick)
+      //  .force(
+      //     "link",
+      //     d3
+      //       .forceLink(that.graph.links)
+      //       .distance(200)
+      //       // .strength(0.9)
+      //   )
+      //  .force("forceX",
+      //   d3.forceX(0)
+      //   )
         
         ;
+        var previousposition = -increment+10
+        console.log(increment)
+        for (var node in that.graph.nodes){
+          that.graph.nodes[node].x = previousposition + increment
+          previousposition = that.graph.nodes[node].x 
+        }
+      
+      that.graph.nodes[0].x = 10
+      that.graph.nodes[that.graph.nodes.length -1].x = that.settings.svgWigth - 110
+
+      
         
     
     },
