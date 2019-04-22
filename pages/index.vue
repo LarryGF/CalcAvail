@@ -8,6 +8,8 @@
         <v-card-title class="headline">Welcome to the Vuetify + Nuxt.js template</v-card-title>
         <v-card-text>
           <v-btn @click="createChain">Create chain</v-btn>
+          <v-btn @click="createRBD">Create RBD</v-btn>
+
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -30,6 +32,9 @@ export default {
       eel.create_chain()((result) =>this.$router.push('/markov/'+ result)  )
       
       
+    },
+    createRBD: async function () {
+      eel.create_rbd()((result) => console.log(result),this.$router.push('/rbd_main') )
     }
   }
 }

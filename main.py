@@ -10,7 +10,31 @@ persistent_data = {
 
 
 
+
+
 eel.init('dist')
+
+@eel.expose
+def create_rbd():
+    rbd = RBD('rbd')
+    persistent_data['rbd'] = rbd
+    block1 = Block('b1',True, False)
+    block2 = Block('b2',False, False)
+    block3 = Block('b3',False, True)
+    parallel1 = Parallel_Block('1',False,False,4,2)
+    persistent_data['rbd'].add_block(block1)
+    persistent_data['rbd'].add_block(parallel1)
+    persistent_data['rbd'].add_block(block2)
+    persistent_data['rbd'].blocks[0].add_path(parallel1)
+    persistent_data['rbd'].blocks[1].add_path(block2)
+
+    return True
+
+@eel.expose
+def get_rbd():
+    print(persistent_data['rbd'].to_json())
+    return persistent_data['rbd'].to_json()
+
 
 
 @eel.expose
@@ -24,11 +48,7 @@ def create_chain():
     
     return chainid
 
-
-@eel.expose
-def hello():
-    print('fatso')
-    return 'hello fat'
+    
 
 
 @eel.expose

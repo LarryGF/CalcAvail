@@ -155,6 +155,8 @@ class Block:
         self.isLast = isLast
         self.embedded_chain = None
         self.block_availability = None
+        self.amount = 1
+
 
     def add_path(self, block):
         """ the direction is from self -> block"""
@@ -366,6 +368,24 @@ class RBD:
 
         self.availability = availability
         return self.availability
+
+    def to_json(self):
+    
+        pos = { block.blockid:i for i, block in enumerate(self.blocks)}
+        print(pos)
+        return {
+            'blocks': [{
+                'id': n.blockid,
+                'amount':n.amount
+            } for n in self.blocks],
+
+            'links': [
+                {
+                    'source': pos[block.blockid],
+                    'target': pos[block.outgoing_block.blockid],
+                } for block in self.blocks if block.outgoing_block 
+            ],
+        }
 
     def __str__(self):
         return f'Availability: {self.availability} \n Blocks: {self.blocks}'

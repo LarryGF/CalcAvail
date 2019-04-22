@@ -28,8 +28,8 @@
         marker-mid="url(#arrowhead)"
         pointer-events="none"
       ></path>
-
-      <g v-for="(item, index) in graph.nodes" :key="'rect' + index">
+     
+      <g v-for="(item, index) in graph.blocks" :key="'rect' + index">
         <rect
           v-if="item.amount>1"
           width="100"
@@ -109,12 +109,14 @@ export default {
     item: null,
     stateIds: []
   }),
-  watch: {
-    items: function() {
-      this.stateIds = this.items.map(state => state.id);
-    }
+  // watch: {
+  //   // items: function() {
+  //   //   this.stateIds = this.items.map(state => state.id);
+  //   // }
+  // },
+  mounted: function () {
+    console.log(this.graph)
   },
-
   methods: {
     adjustRectHeight: function(item, i) {
       if (item.amount > 1) {
