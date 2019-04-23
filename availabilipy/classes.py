@@ -372,7 +372,6 @@ class RBD:
     def to_json(self):
     
         pos = { block.blockid:i for i, block in enumerate(self.blocks)}
-        print(pos)
         return {
             'blocks': [{
                 'id': n.blockid,

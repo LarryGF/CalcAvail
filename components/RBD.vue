@@ -21,12 +21,12 @@
         fill="none"
         stroke="yellow"
         v-for="(item, index) in graph.links"
-        :stroke-width="item.width"
+        stroke-width="2.7"
         :key="'line'+index"
         :d="d(item.source, item.target)"
         :id="'edge' + index"
-        marker-mid="url(#arrowhead)"
-        pointer-events="none"
+        marker-end="url(#arrowhead)"
+
       ></path>
      
       <g v-for="(item, index) in graph.blocks" :key="'rect' + index">
@@ -37,7 +37,7 @@
           rx="10"
           ry="10"
           :x="item.x"
-          :y="item.y-70"
+          :y="settings.svgHeight/2-70"
           fill="none"
           stroke="#fff"
         ></rect>
@@ -49,7 +49,7 @@
           rx="10"
           ry="10"
           :x="item.x"
-          :y="item.y"
+          :y="settings.svgHeight/2 +3"
           fill="none"
           stroke="#fff"
         ></rect>
@@ -120,16 +120,16 @@ export default {
   methods: {
     adjustRectHeight: function(item, i) {
       if (item.amount > 1) {
-        return item.y - 45 + i * 50 - 70;
+        return this.settings.svgHeight/2 - 45 + i * 50 - 70;
       } else {
-        return item.y - 45 + i * 50;
+        return this.settings.svgHeight/2 - 42 + i * 50;
       }
     },
     adjustTextHeight: function(item, i) {
       if (item.amount > 1) {
-        return item.y - 20 + i * 50 - 70;
+        return this.settings.svgHeight/2 - 20 + i * 50 - 70;
       } else {
-        return item.y - 20 + i * 50;
+        return this.settings.svgHeight/2 - 20 + i * 50;
       }
     },
 
@@ -137,7 +137,7 @@ export default {
       
       var x1 = source.x +100 ,
         y1 = source.y + 30,
-        x2 = target.x ,
+        x2 = target.x -10,
         y2 = target.y + 30,
         dx = x2 - x1,
         dy = y2 - y1,

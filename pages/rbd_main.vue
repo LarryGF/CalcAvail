@@ -1,6 +1,7 @@
 <template>
   <v-layout column>
     <!-- <Dialog :dialog="dialog" :states="graph.blocks" @close="dialog=false" @save="addTransition"/> -->
+    <AddBlockDialog :dialog="dialog" @close="dialog=false" @save="addBlock"/>
     <!-- <DeleteDialog
       :delete_dialog="delete_dialog"
       :items="items_to_delete"
@@ -15,22 +16,26 @@
       :selected="selectedStates"
       @close="select_dialog=false"
       @select="selectStates"
-    /> -->
+    />-->
 
     <v-flex xs12>
       <RBD :viewBox="viewBox" :settings="settings" :graph="graph"/>
     </v-flex>
     <v-flex xs12>
       <v-layout row mt-1>
-        <v-btn color="green" @click="solve">Solve chain</v-btn>
+        <v-btn color="green" @click="solve">Solve System</v-btn>
         <v-spacer></v-spacer>
-        <v-btn @click="addNode"><v-icon>add</v-icon> Add Node</v-btn>
-        <v-btn @click="dialog=true"><v-icon>add</v-icon> Add transition</v-btn>
-        <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select blocks</v-btn>
-        <v-btn color="error" @click="delete_dialog_prepare('node')"><v-icon>delete</v-icon>Delete node</v-btn>
-        <v-btn color="error" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn>
+        <v-btn @click="dialog=true">
+          <v-icon>add</v-icon>Add Block
+        </v-btn>
+        <v-btn @click="dialog_rbd_transition=true"><v-icon>add</v-icon> Add transition</v-btn>
+        <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select blocks</v-btn> -->
+        <v-btn color="error" @click="delete_dialog_prepare('node')">
+          <v-icon>delete</v-icon>Delete block
+        </v-btn>
+        <!-- <v-btn color="error" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn> -->
         <v-spacer></v-spacer>
-        <v-btn  outline > Availability: {{availability}}</v-btn>
+        <v-btn outline>Availability: {{availability}}</v-btn>
       </v-layout>
     </v-flex>
   </v-layout>
@@ -38,17 +43,17 @@
 
 <script>
 import * as d3 from "d3";
-import Dialog from "../components/Dialog.vue";
-import DeleteDialog from "../components/Delete_dialog.vue";
-import SelectDialog from "../components/SelectDialog.vue"
-import RBD from "../components/RBD.vue"
+import DeleteDialog from "../components/Delete_dialog";
+import SelectDialog from "../components/SelectDialog";
+import RBD from "../components/RBD";
+import AddBlockDialog from "../components/AddBlockDialog";
 
 export default {
   data: function() {
     return {
-      availability:'?',
+      availability: "?",
       dialog: false,
-      delete_dialog: false,
+      dialog_rbd_transition: false,
       select_dialog: false,
       selectedStates: [],
       items_to_delete: [],
@@ -57,168 +62,13 @@ export default {
       simulation: null,
       viewBox: "0 0 960 600",
       graph: {
-        blocks: [
-          // {
-          //   id:1,
-          //   x:0,
-          //   y:100,
-          //   amount:4
-
-          // },
-          // {
-          //   id:2,
-          //   x:0,
-          //   y:100,
-          //   amount:1
-
-          // },
-          // {
-          //   id:3,
-          //   x:0,
-          //   y:100,
-          //   amount:4
-
-          // },
-          // {
-          //   id:4,
-          //   x:0,
-          //   y:100,
-          //   amount:2
-
-          // },
-          // {
-          //   id:5,
-          //   x:0,
-          //   y:100,
-          //   amount:3
-
-          // },
-          // {
-          //   id:6,
-          //   x:0,
-          //   y:100,
-          //   amount:2
-
-          // },
-          // {
-          //   id:7,
-          //   x:0,
-          //   y:100,
-          //   amount:1
-
-          // },
-          // {
-          //   id:8,
-          //   x:0,
-          //   y:100,
-          //   amount:4
-
-          // },
-          // {
-          //   id:9,
-          //   x:0,
-          //   y:100,
-          //   amount:1
-
-          // },
-          // {
-          //   id:10,
-          //   x:0,
-          //   y:100,
-          //   amount:2
-
-          // },
-          //  {
-          //   id:11,
-          //   x:0,
-          //   y:100,
-          //   amount:1
-
-          // },
-          // {
-          //   id:12,
-          //   x:0,
-          //   y:100,
-          //   amount:2
-
-          // },
-          // {
-          //   id:13,
-          //   x:0,
-          //   y:100,
-          //   amount:2
-
-          // },
-          // {
-          //   id:14,
-          //   x:0,
-          //   y:100,
-          //   amount:2
-
-          // }
-        ],
-        links:[
-          // {
-          //   id:0,
-          //   source:0,
-          //   target:1
-          // },
-          // {
-          //   id:1,
-          //   source:1,
-          //   target:2
-          // },
-          // {
-          //   id:2,
-          //   source:2,
-          //   target:3
-          // },
-          // {
-          //   id:3,
-          //   source:3,
-          //   target:4
-          // },
-          // {
-          //   id:4,
-          //   source:4,
-          //   target:5
-          // },
-          // {
-          //   id:5,
-          //   source:5,
-          //   target:6
-          // },
-          // {
-          //   id:6,
-          //   source:6,
-          //   target:7
-          // },
-          // {
-          //   id:7,
-          //   source:7,
-          //   target:8
-          // },
-          // {
-          //   id:8,
-          //   source:8,
-          //   target:9
-          // },
-          // {
-          //   id:9,
-          //   source:10,
-          //   target:11
-          // },
-          // {
-          //   id:10,
-          //   source:11,
-          //   target:12
-          // },{
-          //   id:11,
-          //   source:12,
-          //   target:13
-          // },
-          
-          
+        blocks: [],
+        links: [
+          {
+            id:0,
+            source:0,
+            target:1
+          }
         ]
       },
       simulation: null,
@@ -232,11 +82,12 @@ export default {
     };
   },
   components: {
-    Dialog,
     DeleteDialog,
     SelectDialog,
-    RBD
+    RBD,
+    AddBlockDialog
   },
+  
   mounted: function() {
     this.loadInitial();
     this.viewBox =
@@ -253,30 +104,28 @@ export default {
       let that = this;
       eel.get_rbd()(a => {
         this.graph = this.loadFromJson(a);
-        console.log('graph')
-        console.log(this.graph)
-
-        
-        this.run_simulation();
-      });
-    },
-
-    getData: async function () {
-      eel.get_data()(a => {
-        this.graph = this.loadFromJson(a);
+        console.log("graph");
+        console.log(this.graph);
 
         this.run_simulation();
       });
     },
+
+    // getData: async function() {
+    //   eel.get_data()(a => {
+    //     this.graph = this.loadFromJson(a);
+
+    //     this.run_simulation();
+    //   });
+    // },
 
     loadFromJson: function(json) {
       for (var node in json.blocks) {
-        
         json.blocks[node].x = 0;
         json.blocks[node].y = 100;
         json.blocks[node].vx = 0;
         json.blocks[node].vy = 0;
-        json.blocks[node].color = '#fff'
+        json.blocks[node].color = "#fff";
       }
 
       return json;
@@ -301,91 +150,61 @@ export default {
           element.y = 600;
         }
       }
-      
     },
     run_simulation: function() {
       var that = this;
-      console.log(that.graph.blocks.length)
-      console.log(that.graph.blocks)
-        var increment = that.settings.svgWigth/that.graph.blocks.length
+      var increment = that.settings.svgWigth / that.graph.blocks.length;
 
       that.simulation = d3
-        .forceSimulation(that.graph.blocks )
+        .forceSimulation(that.graph.blocks)
         .on("tick", this.tick)
-        .force(
-          "link",
-          d3
-            .forceLink(that.graph.links)
-            .distance(increment)
-        )
-        // .force(
-        //   "center",
-        //   d3.forceCenter(
-        //     that.settings.svgWigth / 2,
-        //     that.settings.svgHeight / 2
-        //   )
-        // )
-        // .force("collision", d3.forceCollide()
-        // // .strength(7.5)
-        // // .radius(90)
-        // )
-        // .force(
-        //   "manybody",
-        //   d3.forceManyBody().distanceMin(200).strength(-10)
-        // )
+        .force("link", d3.forceLink(that.graph.links).distance(increment))
 
-        .force("forceY",
-        d3.forceY(that.settings.svgHeight / 2)
-        .strength(100)
-        )
-       ;
-      //  that.simulation = d3.forceSimulation(that.graph.blocks[-1])
-      //  .on("tick",this.tick)
-      //  .force(
-      //     "link",
-      //     d3
-      //       .forceLink(that.graph.links)
-      //       .distance(200)
-      //       // .strength(0.9)
-      //   )
-      //  .force("forceX",
-      //   d3.forceX(0)
-      //   )
-        
-        ;
-        var previousposition = -increment+10
-        console.log(increment)
-        for (var node in that.graph.blocks){
-          that.graph.blocks[node].x = previousposition + increment
-          previousposition = that.graph.blocks[node].x 
-        }
-      
-      that.graph.blocks[0].x = 10
-      that.graph.blocks[that.graph.blocks.length -1].x = that.settings.svgWigth - 110
+        .force("forceY", d3.forceY(that.settings.svgHeight / 2).strength(100));
 
-      
-        
-    
+      var previousposition = -increment + 10;
+      for (var node in that.graph.blocks) {
+        that.graph.blocks[node].x = previousposition + increment;
+        previousposition = that.graph.blocks[node].x;
+      }
+      if (that.graph.blocks.length != 0){
+
+        that.graph.blocks[0].x = 10;
+      that.graph.blocks[that.graph.blocks.length - 1].x =
+        that.settings.svgWigth - 110;
+      }
     },
-    addNode: async function() {
-      eel.add_node("S" + String(this.stateNumber))((result) => console.log(result))
+    addBlock: async function(data) {
+      this.dialog = false;
+      eel.add_block(data.value, "B" + String(this.stateNumber), data.active)(
+        result => console.log(result)
+      );
       this.stateNumber++;
-      this.getData()
+      this.loadInitial();
+      this.run_simulation();
+      // eel.add_block("S" + String(this.stateNumber))((result) => console.log(result))
+      // this.stateNumber++;
+      // this.getData()
       // this.run_simulation();
     },
     addTransition: function(data) {
       this.dialog = false;
-      eel.add_transition(data.fromState,data.toState,data.rate)((result) => console.log(result))
-      this.getData()
+      eel.add_transition(data.fromState, data.toState, data.rate)(result =>
+        console.log(result)
+      );
+      this.getData();
     },
 
     delete_dialog_prepare: function(string) {
       if (string === "transition") {
-        for (var link in this.graph.links){
-          this.graph.links[link].id = this.graph.links[link].source.id + "=>" + this.graph.links[link].target.id
+        for (var link in this.graph.links) {
+          this.graph.links[link].id =
+            this.graph.links[link].source.id +
+            "=>" +
+            this.graph.links[link].target.id;
         }
         this.items_to_delete = this.graph.links;
-        
+
         this.delete_title = "transition";
       } else if (string === "node") {
         this.items_to_delete = this.graph.blocks;
@@ -399,20 +218,16 @@ export default {
       this.delete_dialog = false;
       if (this.delete_title === "transition") {
         this.delete_title = "";
-        eel.delete_transition(data)((result) => console.log(result))
+        eel.delete_transition(data)(result => console.log(result));
       } else if (this.delete_title === "node") {
-        eel.delete_node(data)((result) => console.log(result))
+        eel.delete_node(data)(result => console.log(result));
       }
-        this.getData()
-
+      this.getData();
     },
 
-    
-
-    solve: function(){
-      eel.solve_chain()((result) => this.availability=result)
+    solve: function() {
+      eel.solve_chain()(result => (this.availability = result));
     }
-    
   }
 };
 </script>

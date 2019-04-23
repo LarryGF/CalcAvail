@@ -16,25 +16,34 @@ eel.init('dist')
 
 @eel.expose
 def create_rbd():
+    if persistent_data['rbd']:
+        return True
+
     rbd = RBD('rbd')
+    bloc1 = Block('b1', False, False)
+    parallel = Parallel_Block('p1', False, False, 3, 2)
+    rbd.add_block(bloc1)
+    rbd.add_block(parallel)
+    rbd.blocks[0].add_path(parallel)
     persistent_data['rbd'] = rbd
-    block1 = Block('b1',True, False)
-    block2 = Block('b2',False, False)
-    block3 = Block('b3',False, True)
-    parallel1 = Parallel_Block('1',False,False,4,2)
-    persistent_data['rbd'].add_block(block1)
-    persistent_data['rbd'].add_block(parallel1)
-    persistent_data['rbd'].add_block(block2)
-    persistent_data['rbd'].blocks[0].add_path(parallel1)
-    persistent_data['rbd'].blocks[1].add_path(block2)
+   
+
 
     return True
 
 @eel.expose
 def get_rbd():
+    print('to json')
     print(persistent_data['rbd'].to_json())
     return persistent_data['rbd'].to_json()
 
+@eel.expose
+def add_block(number, id,active):
+    if int(number) > 1:
+        block = Parallel_Block(id, False, False, number, active)
+    else:
+        block = Block(id,False,False)
+    persistent_data['rbd'].add_block(block)
 
 
 @eel.expose

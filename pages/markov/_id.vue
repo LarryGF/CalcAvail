@@ -38,10 +38,10 @@
 
 <script>
 import * as d3 from "d3";
-import Dialog from "../../components/Dialog.vue";
-import DeleteDialog from "../../components/Delete_dialog.vue";
-import SelectDialog from "../../components/SelectDialog.vue"
-import MarkovChain from "../../components/MarkovChain.vue"
+import Dialog from "../../components/Dialog";
+import DeleteDialog from "../../components/Delete_dialog";
+import SelectDialog from "../../components/SelectDialog"
+import MarkovChain from "../../components/MarkovChain"
 
 export default {
   data: function() {
