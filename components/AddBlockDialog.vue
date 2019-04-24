@@ -28,37 +28,7 @@
               :items="generate()"
               @keyup.enter.native="save"
             ></v-autocomplete>
-            <!-- <v-autocomplete
-          ref="second"
-          v-model="to"
-          dense
-          label="To State"
-          :items="stateIds"
-          outline
-              @keyup.enter.native="$refs.third.focus()"
-
-            ></v-autocomplete>-->
           </v-container>
-
-          <!-- <v-container fluid>
-            <v-text-field
-              ref="third"
-              v-model="value"
-              label="Transition rate"
-              required
-              :rules="[rules.required]"
-              counter
-              maxlength="5"
-              loading
-              mask="#.###"
-              return-masked-value
-              @keyup.enter.native="save"
-
-            >
-            <v-progress-linear slot="progress" :value="progress" :color="color" height="7"></v-progress-linear>
-            </v-text-field>
-          </v-container>-->
-          <!-- <small>*indicates required field</small> -->
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -84,53 +54,40 @@ export default {
 
     stateIds: [1, 2, 3, 4]
   }),
-  watch: {
-    // states: function () {this.stateIds = this.states.map((state) => state.id)}
-  },
-  computed: {
-    // progress () {
-    //   return Math.min(100, this.value.length * 20)
-    // },
-    // color () {
-    //   return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]
-    // }
-  },
+  watch: {},
+  computed: {},
   methods: {
     save: function() {
-        console.log(this.value)
-        console.log(this.active)
+      console.log(this.value);
+      console.log(this.active);
 
-        if (this.value && this.active || this.value ==1){
-
-    var data = {value:this.value,active:this.active};
-      this.value = null;
-      this.active = ""
-      this.$emit("save", data);
+      if ((this.value && this.active) || this.value == 1) {
+        var data = { value: this.value, active: this.active };
+        this.value = null;
+        this.active = "";
+        this.$emit("save", data);
       } else {
-      this.value = null;
-      this.active = null
-          
+        this.value = null;
+        this.active = null;
       }
     },
-    determine: function () {
-        if (this.value ==1){
-            return this.save()
-        }
-        else if (this.value){
-            return this.$refs.second.focus()
-        }
+    determine: function() {
+      if (this.value == 1) {
+        return this.save();
+      } else if (this.value) {
+        return this.$refs.second.focus();
+      }
     },
-    generate: function (){
-        var newList = []
-        for (var element in this.stateIds){
-            if (this.stateIds[element] != this.value){
-                newList.push(this.stateIds[element])
-            }
-            else{
-                newList.push(this.stateIds[element])
-                return newList
-            }
+    generate: function() {
+      var newList = [];
+      for (var element in this.stateIds) {
+        if (this.stateIds[element] != this.value) {
+          newList.push(this.stateIds[element]);
+        } else {
+          newList.push(this.stateIds[element]);
+          return newList;
         }
+      }
     }
   }
 };

@@ -9,10 +9,8 @@ persistent_data = {
 }
 
 
-
-
-
 eel.init('dist')
+
 
 @eel.expose
 def create_rbd():
@@ -22,14 +20,16 @@ def create_rbd():
     rbd = RBD('rbd')
     bloc1 = Block('b1', False, False)
     parallel = Parallel_Block('p1', False, False, 3, 2)
+    parallel2 = Parallel_Block('p2', False, False, 3, 2)
+
     rbd.add_block(bloc1)
     rbd.add_block(parallel)
+    rbd.add_block(parallel2)
     rbd.blocks[0].add_path(parallel)
     persistent_data['rbd'] = rbd
-   
-
 
     return True
+
 
 @eel.expose
 def get_rbd():
@@ -37,14 +37,26 @@ def get_rbd():
     print(persistent_data['rbd'].to_json())
     return persistent_data['rbd'].to_json()
 
+
 @eel.expose
-def add_block(number, id,active):
+def add_block(number, id, active):
     if int(number) > 1:
         block = Parallel_Block(id, False, False, number, active)
     else:
-        block = Block(id,False,False)
+        block = Block(id, False, False)
     persistent_data['rbd'].add_block(block)
 
+@eel.expose
+def add_path(fromBlock, toBlock):
+    fromB=search_block(fromBlock)
+    toB=search_block(toBlock)
+    print(fromB)
+    print(toB)
+    if toB.outgoing_block == fromB:
+        return False
+    else:
+        fromB.add_path(toB)
+    return True
 
 @eel.expose
 def create_chain():
@@ -54,10 +66,8 @@ def create_chain():
         chainid = str(random.randint(1, 2))
     current_chain = MarkovChain(chainid)
     persistent_data['chains'][chainid] = current_chain
-    
-    return chainid
 
-    
+    return chainid
 
 
 @eel.expose
@@ -75,39 +85,44 @@ def get_data():
     print(current_chain.to_json())
     return current_chain.to_json()
 
+
 @eel.expose
 def add_node(name):
     current_chain.add_node(Node(name))
     return True
 
+
 @eel.expose
 def add_transition(from_node, to_node, ratio):
-    from_node = get_node(from_node)
+    from_node = search_node(from_node)
     if not from_node:
         return False
-    to_node = get_node(to_node)
+    to_node = search_node(to_node)
     if not to_node:
         return False
-    from_node.add_path(to_node,float(ratio))
+    from_node.add_path(to_node, float(ratio))
     return True
+
 
 @eel.expose
 def delete_transition(data):
     nodes = data.split('=>')
     print(nodes)
-    node = get_node(nodes[0])
-    to_delete = get_node(nodes[1])
+    node = search_node(nodes[0])
+    to_delete = search_node(nodes[1])
     node.del_path(to_delete)
     return True
 
+
 @eel.expose
 def delete_node(data):
-    node = get_node(data)
+    node = search_node(data)
     if node:
         current_chain.del_node(node)
         return True
     else:
         return False
+
 
 @eel.expose
 def set_nodelist(nodelist):
@@ -115,18 +130,28 @@ def set_nodelist(nodelist):
     print(current_chain.nodelist)
     return True
 
+
 @eel.expose
 def solve_chain():
     result = current_chain.get_availability()
-    
-    return round(result,4)
 
-def get_node(nodeid):
+    return round(result, 4)
+
+
+def search_node(nodeid):
     print(current_chain.chainid)
     for node in current_chain.nodes:
         if node.nodeid == nodeid:
             return node
-    
+
+    return False
+
+
+def search_block(blockid):
+    for block in persistent_data['rbd'].blocks:
+        if block.blockid == blockid:
+            return block
+
     return False
 
 

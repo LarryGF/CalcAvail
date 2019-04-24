@@ -2,6 +2,8 @@
   <v-layout column>
     <!-- <Dialog :dialog="dialog" :states="graph.blocks" @close="dialog=false" @save="addTransition"/> -->
     <AddBlockDialog :dialog="dialog" @close="dialog=false" @save="addBlock"/>
+    <AddPathDialog :path_dialog="path_dialog" :blocks="graph.blocks" :links="graph.links" @close="path_dialog=false" @create="addPath"/>
+    
     <!-- <DeleteDialog
       :delete_dialog="delete_dialog"
       :items="items_to_delete"
@@ -28,7 +30,7 @@
         <v-btn @click="dialog=true">
           <v-icon>add</v-icon>Add Block
         </v-btn>
-        <v-btn @click="dialog_rbd_transition=true"><v-icon>add</v-icon> Add transition</v-btn>
+        <v-btn @click="path_dialog=true"><v-icon>add</v-icon> Add path</v-btn>
         <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select blocks</v-btn> -->
         <v-btn color="error" @click="delete_dialog_prepare('node')">
           <v-icon>delete</v-icon>Delete block
@@ -47,15 +49,14 @@ import DeleteDialog from "../components/Delete_dialog";
 import SelectDialog from "../components/SelectDialog";
 import RBD from "../components/RBD";
 import AddBlockDialog from "../components/AddBlockDialog";
+import AddPathDialog from "../components/AddPathDIalog"
 
 export default {
   data: function() {
     return {
       availability: "?",
       dialog: false,
-      dialog_rbd_transition: false,
-      select_dialog: false,
-      selectedStates: [],
+      path_dialog:false,
       items_to_delete: [],
       delete_title: "",
       stateNumber: 0,
@@ -83,9 +84,9 @@ export default {
   },
   components: {
     DeleteDialog,
-    SelectDialog,
     RBD,
-    AddBlockDialog
+    AddBlockDialog,
+    AddPathDialog
   },
   
   mounted: function() {
@@ -187,12 +188,15 @@ export default {
       // this.getData()
       // this.run_simulation();
     },
-    addTransition: function(data) {
-      this.dialog = false;
-      eel.add_transition(data.fromState, data.toState, data.rate)(result =>
-        console.log(result)
-      );
-      this.getData();
+    addPath: function(data) {
+      this.path_dialog = false;
+      // eel.add_transition(data.fromState, data.toState, data.rate)(result =>
+      //   console.log(result)
+      // );
+      // this.getData();
+      eel.add_path(data.from,data.to)((result) => console.log(result))
+      this.loadInitial();
+      this.run_simulation();
     },
 
     delete_dialog_prepare: function(string) {
