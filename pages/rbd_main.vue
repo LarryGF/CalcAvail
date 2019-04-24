@@ -4,7 +4,7 @@
     <AddBlockDialog :dialog="dialog" @close="dialog=false" @save="addBlock"/>
     <AddPathDialog :path_dialog="path_dialog" :blocks="graph.blocks" :links="graph.links" @close="path_dialog=false" @create="addPath"/>
     
-    <!-- <DeleteDialog
+    <DeleteDialogRBD
       :delete_dialog="delete_dialog"
       :items="items_to_delete"
       :selected="delete_title"
@@ -12,13 +12,13 @@
       @delete="delete_element"
     />
 
-    <SelectDialog
+    <!-- <SelectDialog
       :select_dialog="select_dialog"
       :items="graph.blocks"
       :selected="selectedStates"
       @close="select_dialog=false"
       @select="selectStates"
-    />-->
+    /> -->
 
     <v-flex xs12>
       <RBD :viewBox="viewBox" :settings="settings" :graph="graph"/>
@@ -32,10 +32,10 @@
         </v-btn>
         <v-btn @click="path_dialog=true"><v-icon>add</v-icon> Add path</v-btn>
         <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select blocks</v-btn> -->
-        <v-btn color="error" @click="delete_dialog_prepare('node')">
+        <v-btn color="error" @click="delete_dialog_prepare('block')">
           <v-icon>delete</v-icon>Delete block
         </v-btn>
-        <!-- <v-btn color="error" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn> -->
+        <v-btn color="error" @click="delete_dialog_prepare('path')"><v-icon>delete</v-icon>Delete path</v-btn>
         <v-spacer></v-spacer>
         <v-btn outline>Availability: {{availability}}</v-btn>
       </v-layout>
@@ -45,7 +45,7 @@
 
 <script>
 import * as d3 from "d3";
-import DeleteDialog from "../components/Delete_dialog";
+import DeleteDialogRBD from "../components/DeleteDialogRBD";
 import SelectDialog from "../components/SelectDialog";
 import RBD from "../components/RBD";
 import AddBlockDialog from "../components/AddBlockDialog";
@@ -54,6 +54,7 @@ import AddPathDialog from "../components/AddPathDIalog"
 export default {
   data: function() {
     return {
+      delete_dialog:false,
       availability: "?",
       dialog: false,
       path_dialog:false,
@@ -83,7 +84,7 @@ export default {
     };
   },
   components: {
-    DeleteDialog,
+    DeleteDialogRBD,
     RBD,
     AddBlockDialog,
     AddPathDialog
@@ -200,7 +201,7 @@ export default {
     },
 
     delete_dialog_prepare: function(string) {
-      if (string === "transition") {
+      if (string === "path") {
         for (var link in this.graph.links) {
           this.graph.links[link].id =
             this.graph.links[link].source.id +
@@ -209,10 +210,10 @@ export default {
         }
         this.items_to_delete = this.graph.links;
 
-        this.delete_title = "transition";
-      } else if (string === "node") {
+        this.delete_title = "path";
+      } else if (string === "block") {
         this.items_to_delete = this.graph.blocks;
-        this.delete_title = "node";
+        this.delete_title = "block";
       }
 
       this.delete_dialog = true;
@@ -220,13 +221,13 @@ export default {
 
     delete_element: function(data) {
       this.delete_dialog = false;
-      if (this.delete_title === "transition") {
+      if (this.delete_title === "path") {
         this.delete_title = "";
-        eel.delete_transition(data)(result => console.log(result));
-      } else if (this.delete_title === "node") {
-        eel.delete_node(data)(result => console.log(result));
+        eel.del_path(data)(result => console.log(result));
+      } else if (this.delete_title === "block") {
+        eel.del_block(data)(result => console.log(result));
       }
-      this.getData();
+      this.loadInitial();
     },
 
     solve: function() {

@@ -342,6 +342,7 @@ class RBD:
 
     def add_block(self, block: Block):
         for block_element in self.blocks:
+            
             if block_element.blockid == block.blockid:
                 raise Exception('Block already in chain')
         self.blocks.append(block)
@@ -349,6 +350,7 @@ class RBD:
 
     def delete_block(self, blockid):
         for block_element in self.blocks:
+            
             if block_element.blockid == blockid:
                 self.blocks.pop(self.blocks.index(block_element))
                 return

@@ -59,6 +59,21 @@ def add_path(fromBlock, toBlock):
     return True
 
 @eel.expose
+def del_path(data):
+    blocks = data.split('=>')
+    block = search_block(blocks[0])
+    to_delete = search_block(blocks[1])
+    block.del_path(to_delete)
+    return True
+
+@eel.expose
+def del_block(data):
+    # block = search_block(data)
+    # print(block)
+    persistent_data['rbd'].delete_block(data)
+    return True
+
+@eel.expose
 def create_chain():
     global current_chain
     chainid = str(random.randint(1, 10000))

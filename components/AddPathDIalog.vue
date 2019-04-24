@@ -79,17 +79,18 @@ export default {
       return to.map(block => block.id);
     },
     generate: function() {
-      var from = [];
-      for (var link in this.links) {
+      var source = [];
+      var from = this.blocks
         for (var block in this.blocks) {
-          if (block != this.links[link].source.index) {
-            console.log(this.links[link].target.index)
+      for (var link in this.links) {
+          if (block == this.links[link].source.index) {
 
-            from.push(this.blocks[block]);
+            source.push(block);
           }
         }
       }
 
+      
       return from.map(block => block.id);
     }
   }
