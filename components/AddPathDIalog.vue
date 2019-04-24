@@ -76,7 +76,7 @@ export default {
           }
         }
       }
-      return to.map(block => block.id);
+      return this.blocks.map(block => block.id);
     },
     generate: function() {
       var source = [];

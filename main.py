@@ -68,8 +68,13 @@ def del_path(data):
 
 @eel.expose
 def del_block(data):
-    # block = search_block(data)
-    # print(block)
+    block = search_block(data)
+    if block.outgoing_block:
+        block.del_path(block.outgoing_block)
+    for current_block in persistent_data['rbd'].blocks:
+        if current_block.outgoing_block == block:
+            current_block.del_path(current_block.outgoing_block)
+            
     persistent_data['rbd'].delete_block(data)
     return True
 
