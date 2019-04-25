@@ -35,6 +35,7 @@ export default {
     },
     load: async function () {
       eel.load()((result) => console.log(result) )
+      this.$router.push('/rbd_main')
     }
   }
 }

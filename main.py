@@ -18,27 +18,71 @@ def save():
     file = open('save.json', 'w')
     data = {
         'rbd': persistent_data['rbd'].to_json(),
-        'chains': [persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']]
+        'chains': {persistent_data['chains'][chain].chainid: persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']}
     }
     json.dump(data, file)
     file.close()
     return True
+
 
 @eel.expose
 def load():
     file = open('save.json')
     data = json.load(file)
     file.close()
+    create_rbd()
+    load_blocks(data['rbd']['blocks'])
+    load_links(data['rbd']['links'])
+    load_chains(data['chains'],data['rbd']['blocks'])
     return True
 
+
+def load_blocks(blocks):
+    for block in blocks:
+        add_block(block['amount'], block['id'], block['valid'])
+
+
+def load_links(links):
+    for link in links:
+        add_path(persistent_data['rbd'].blocks[link['source']].blockid,
+                 persistent_data['rbd'].blocks[link['target']].blockid)
+
+
+def load_chains(chains, blocks):
+    global current_chain
+    for block in blocks:
+        chainid = block['chainid']
+        if chainid:
+            current_block = search_block(block['id'])
+            current_chain = MarkovChain(chainid)
+            persistent_data['chains'][chainid] = current_chain
+            current_block.embed_chain(current_chain)
+            chain_specs = chains[chainid]
+            for node in chain_specs['nodes']:
+                add_node(node['id'])
+
+            for link in chain_specs['links']:
+                print('link')
+                print(link)
+                from_node = current_chain.nodes[link['source']]
+                to_node = current_chain.nodes[link['target']]
+                add_transition(from_node.nodeid,to_node.nodeid,link['ratio'])
+
+
+        
+        else:
+            pass
+
 ######################################## RBD ########################################################################
+
+
 @eel.expose
 def create_rbd():
     if persistent_data['rbd']:
         return True
 
     rbd = RBD('rbd')
-   
+
     persistent_data['rbd'] = rbd
 
     return True
@@ -61,10 +105,11 @@ def add_block(number, id, active):
         block = Block(id, False, False)
     persistent_data['rbd'].add_block(block)
 
+
 @eel.expose
 def add_path(fromBlock, toBlock):
-    fromB=search_block(fromBlock)
-    toB=search_block(toBlock)
+    fromB = search_block(fromBlock)
+    toB = search_block(toBlock)
     print(fromB)
     print(toB)
     if toB.outgoing_block == fromB:
@@ -72,6 +117,7 @@ def add_path(fromBlock, toBlock):
     else:
         fromB.add_path(toB)
     return True
+
 
 @eel.expose
 def del_path(data):
@@ -81,6 +127,7 @@ def del_path(data):
     block.del_path(to_delete)
     return True
 
+
 @eel.expose
 def del_block(data):
     block = search_block(data)
@@ -89,9 +136,10 @@ def del_block(data):
     for current_block in persistent_data['rbd'].blocks:
         if current_block.outgoing_block == block:
             current_block.del_path(current_block.outgoing_block)
-            
+
     persistent_data['rbd'].delete_block(data)
     return True
+
 
 @eel.expose
 def attach_chain(data):
@@ -105,10 +153,9 @@ def attach_chain(data):
         chainid = str(random.randint(1, 10000))
     current_chain = MarkovChain(chainid)
     persistent_data['chains'][chainid] = current_chain
-    block.embed_chain(current_chain)    
+    block.embed_chain(current_chain)
 
     return chainid
-
 
 
 ############################################# CTMC #################################################################

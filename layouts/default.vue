@@ -80,7 +80,7 @@ export default {
       fixed: true,
       items: [
         { icon: "apps", title: "Welcome", to: "/" },
-        { icon: "bubble_chart", title: "Markov", to: "/noutech" },
+        { icon: "bubble_chart", title: "RBD", to: "/rbd_main" },
         { icon: "settings", title: "Settings", to: "/Settings" },
         
       ],
