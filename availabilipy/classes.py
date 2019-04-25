@@ -378,7 +378,7 @@ class RBD:
             'blocks': [{
                 'id': n.blockid,
                 'amount': n.amount,
-                'chainid': n.embedded_chain.chainid if n.embedded_chain else ''
+                'chainid': n.embedded_chain.chainid if n.embedded_chain else None
             } for n in self.blocks],
 
             'links': [

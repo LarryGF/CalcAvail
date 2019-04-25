@@ -40,6 +40,7 @@
           :y="settings.svgHeight/2-70"
           fill="none"
           stroke="#fff"
+          @dblclick="goChain(item)"
         ></rect>
 
         <rect
@@ -52,6 +53,7 @@
           :y="settings.svgHeight/2 +3"
           fill="none"
           stroke="#fff"
+          @dblclick="goChain(item)"
         ></rect>
 
         <rect
@@ -133,6 +135,7 @@ export default {
       }
     },
 
+
     d: function(source, target) {
       
       var x1 = source.x +100 ,
@@ -203,6 +206,16 @@ export default {
         "," +
         y2
       );
+    },
+    goChain: function (item) {
+      console.log(item)
+      if (item.chainid != null){
+        this.$router.push('/markov/'+ String(item.chainid))
+      }
+      else{
+        console.log('none')
+      }
+
     }
   }
 };
