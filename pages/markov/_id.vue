@@ -22,11 +22,11 @@
     </v-flex>
     <v-flex xs12>
       <v-layout row mt-1>
-        <v-btn color="green" @click="solve">Solve chain</v-btn>
+        <v-btn color="green" @click="select_dialog=true">Solve chain</v-btn>
         <v-spacer></v-spacer>
         <v-btn @click="addNode"><v-icon>add</v-icon> Add Node</v-btn>
         <v-btn @click="dialog=true"><v-icon>add</v-icon> Add transition</v-btn>
-        <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select nodes</v-btn>
+        <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select nodes</v-btn> -->
         <v-btn color="error" @click="delete_dialog_prepare('node')"><v-icon>delete</v-icon>Delete node</v-btn>
         <v-btn color="error" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn>
         <v-spacer></v-spacer>
@@ -243,6 +243,7 @@ export default {
         this.select_dialog = false
         this.selectedStates = data
         eel.set_nodelist(this.selectedStates)((result) => console.log(result))
+        this.solve()
 
     },
 
