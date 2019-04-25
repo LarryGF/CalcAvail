@@ -3,7 +3,7 @@
     <!-- <Dialog :dialog="dialog" :states="graph.blocks" @close="dialog=false" @save="addTransition"/> -->
     <AddBlockDialog :dialog="dialog" @close="dialog=false" @save="addBlock"/>
     <AddPathDialog :path_dialog="path_dialog" :blocks="graph.blocks" :links="graph.links" @close="path_dialog=false" @create="addPath"/>
-    
+    <AttachChainDialog :attach_dialog="attachChain" :items="graph.blocks" @close="attachChain=false" @attach="attachChainToBlock"/>
     <DeleteDialogRBD
       :delete_dialog="delete_dialog"
       :items="items_to_delete"
@@ -32,6 +32,9 @@
         </v-btn>
         <v-btn @click="path_dialog=true"><v-icon>add</v-icon> Add path</v-btn>
         <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select blocks</v-btn> -->
+        <v-btn color="primary" @click="attachChain=true">
+          <v-icon>attach_file</v-icon>Attach Chain
+        </v-btn>
         <v-btn color="error" @click="delete_dialog_prepare('block')">
           <v-icon>delete</v-icon>Delete block
         </v-btn>
@@ -46,14 +49,15 @@
 <script>
 import * as d3 from "d3";
 import DeleteDialogRBD from "../components/DeleteDialogRBD";
-import SelectDialog from "../components/SelectDialog";
 import RBD from "../components/RBD";
 import AddBlockDialog from "../components/AddBlockDialog";
 import AddPathDialog from "../components/AddPathDIalog"
+import AttachChainDialog from "../components/AttachChainDialog"
 
 export default {
   data: function() {
     return {
+      attachChain:false,
       delete_dialog:false,
       availability: "?",
       dialog: false,
@@ -87,7 +91,8 @@ export default {
     DeleteDialogRBD,
     RBD,
     AddBlockDialog,
-    AddPathDialog
+    AddPathDialog,
+    AttachChainDialog
   },
   
   mounted: function() {
@@ -232,6 +237,9 @@ export default {
 
     solve: function() {
       eel.solve_chain()(result => (this.availability = result));
+    },
+    attachChainToBlock: function (data){
+      eel.attach_chain(data)((result) => this.$router.push('/markov/'+ result))
     }
   }
 };

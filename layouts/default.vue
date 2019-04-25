@@ -8,20 +8,13 @@
       app
     >
       <v-list>
-        <v-list-tile
-          router
-          :to="item.to"
-          :key="i"
-          v-for="(item, i) in items"
-          exact
-        >
+        <v-list-tile router :to="item.to" :key="i" v-for="(item, i) in items" exact>
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title v-text="item.title"></v-list-tile-title>
           </v-list-tile-content>
-         
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -44,19 +37,16 @@
         @click.stop="fixed = !fixed"
       >
         <v-icon>remove</v-icon>
-      </v-btn> -->
+      </v-btn>-->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-   <v-btn
-        icon
-        @click.stop="refresh"
-      >
+      <v-btn  absolute fab bottom right icon color="pink" @click.stop="refresh">
         <v-icon>refresh</v-icon>
       </v-btn>
     </v-toolbar>
     <v-content>
       <v-container class="pb-1 pt-3">
-        <nuxt />
+        <nuxt/>
       </v-container>
     </v-content>
     <v-navigation-drawer
@@ -82,26 +72,26 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        clipped: false,
-        drawer: true,
-        fixed: true,
-        items: [
-          { icon: 'apps', title: 'Welcome', to: '/' },
-          { icon: 'bubble_chart', title: 'Markov', to: '/noutech' }
-        ],
-        miniVariant: false,
-        right: true,
-        rightDrawer: false,
-        title: 'Markovify'
-      }
-    },
-    methods: {
-      refresh: function () {
-        document.location.reload()
-      }
+export default {
+  data() {
+    return {
+      clipped: false,
+      drawer: true,
+      fixed: true,
+      items: [
+        { icon: "apps", title: "Welcome", to: "/" },
+        { icon: "bubble_chart", title: "Markov", to: "/noutech" }
+      ],
+      miniVariant: false,
+      right: true,
+      rightDrawer: false,
+      title: "Markovify"
+    };
+  },
+  methods: {
+    refresh: function() {
+      document.location.reload();
     }
   }
+};
 </script>

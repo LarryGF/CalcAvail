@@ -11,6 +11,8 @@
           <v-container fluid >
         
         <v-autocomplete
+          autofocus
+          v-if="delete_dialog"
           v-model="item"
           dense
           :label="'Select '+ this.selected + ' to delete'"

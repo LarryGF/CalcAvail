@@ -1,21 +1,21 @@
 <template>
   <v-layout row justify-center>
-    <v-dialog v-model="delete_dialog" persistent max-width="600px" dark>
+    <v-dialog v-model="attach_dialog" persistent max-width="600px" dark>
       <!-- <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn> -->
       <v-card>
         
         <v-card-title>
-          <span class="headline">Delete {{selected}}</span>
+          <span class="headline">Attach chain to block</span>
         </v-card-title>
         <v-card-text>
           <v-container fluid >
         
         <v-autocomplete
           autofocus
-          v-if="delete_dialog"
+          v-if="attach_dialog"
           v-model="item"
           dense
-          :label="'Select '+ this.selected + ' to delete'"
+          label="Select the block"
           :items="stateIds"
           outline
               @keyup.enter.native="delete_item"
@@ -29,7 +29,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" flat @click="$emit('close')">Close</v-btn>
-          <v-btn color="blue darken-1" flat @click="delete_item">Delete</v-btn>
+          <v-btn color="blue darken-1" flat @click="delete_item">Attach</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -38,11 +38,10 @@
 
 <script>
 export default {
-  name: 'DeleteDialogRBD',
+  name: 'AttachChainDialog',
   props: {
-    delete_dialog: Boolean,
+    attach_dialog: Boolean,
     items: Array,
-    selected: String
 
   },
   data: () => ({
@@ -55,7 +54,7 @@ export default {
  
   methods: {
     delete_item: function () {
-        this.$emit('delete',this.item)
+        this.$emit('attach',this.item)
       this.item = null
     }
   }

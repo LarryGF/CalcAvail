@@ -11,7 +11,7 @@ persistent_data = {
 
 eel.init('dist')
 
-
+######################################## RBD ########################################################################
 @eel.expose
 def create_rbd():
     if persistent_data['rbd']:
@@ -79,15 +79,34 @@ def del_block(data):
     return True
 
 @eel.expose
-def create_chain():
+def attach_chain(data):
     global current_chain
+    block = search_block(data)
+    if block.embedded_chain:
+        return block.embedded_chain.chainid
+        
     chainid = str(random.randint(1, 10000))
     while chainid in persistent_data['chains'].keys():
-        chainid = str(random.randint(1, 2))
+        chainid = str(random.randint(1, 10000))
     current_chain = MarkovChain(chainid)
     persistent_data['chains'][chainid] = current_chain
+    block.embed_chain(current_chain)    
 
     return chainid
+
+
+
+############################################# CTMC #################################################################
+# @eel.expose
+# def create_chain():
+    # global current_chain
+#     chainid = str(random.randint(1, 10000))
+#     while chainid in persistent_data['chains'].keys():
+#         chainid = str(random.randint(1, 10000))
+    # current_chain = MarkovChain(chainid)
+    # persistent_data['chains'][chainid] = current_chain
+
+#     return chainid
 
 
 @eel.expose
