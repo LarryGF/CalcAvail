@@ -49,7 +49,7 @@
         <nuxt/>
       </v-container>
     </v-content>
-    <v-navigation-drawer
+    <!-- <v-navigation-drawer
       temporary
       :right="right"
       v-model="rightDrawer"
@@ -64,7 +64,7 @@
           <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
         </v-list-tile>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
     <v-footer :fixed="fixed" app>
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
@@ -80,7 +80,9 @@ export default {
       fixed: true,
       items: [
         { icon: "apps", title: "Welcome", to: "/" },
-        { icon: "bubble_chart", title: "Markov", to: "/noutech" }
+        { icon: "bubble_chart", title: "Markov", to: "/noutech" },
+        { icon: "settings", title: "Settings", to: "/Settings" },
+        
       ],
       miniVariant: false,
       right: true,

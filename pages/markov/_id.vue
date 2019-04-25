@@ -243,7 +243,10 @@ export default {
         this.select_dialog = false
         this.selectedStates = data
         eel.set_nodelist(this.selectedStates)((result) => console.log(result))
-        this.solve()
+        if(this.selectedStates.length >0){
+
+          this.solve()
+        }
 
     },
 

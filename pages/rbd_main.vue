@@ -236,7 +236,7 @@ export default {
     },
 
     solve: function() {
-      eel.solve_chain()(result => (this.availability = result));
+      // eel.solve_chain()(result => (this.availability = result));
     },
     attachChainToBlock: function (data){
       eel.attach_chain(data)((result) => this.$router.push('/markov/'+ result))

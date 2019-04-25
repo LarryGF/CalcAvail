@@ -66,6 +66,8 @@
           :x="item.x+10"
           :y="adjustRectHeight(item,i)"
           fill="yellow"
+          @dblclick="goChain(item)"
+
         ></rect>
 
         <text

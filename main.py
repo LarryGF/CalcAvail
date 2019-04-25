@@ -1,5 +1,6 @@
 import eel
 import random
+import json
 from availabilipy.classes import *
 
 persistent_data = {
@@ -11,6 +12,25 @@ persistent_data = {
 
 eel.init('dist')
 
+#################################### General ########################################################################
+@eel.expose
+def save():
+    file = open('save.json', 'w')
+    data = {
+        'rbd': persistent_data['rbd'].to_json(),
+        'chains': [persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']]
+    }
+    json.dump(data, file)
+    file.close()
+    return True
+
+@eel.expose
+def load():
+    file = open('save.json')
+    data = json.load(file)
+    file.close()
+    return True
+
 ######################################## RBD ########################################################################
 @eel.expose
 def create_rbd():
@@ -18,14 +38,7 @@ def create_rbd():
         return True
 
     rbd = RBD('rbd')
-    bloc1 = Block('b1', False, False)
-    parallel = Parallel_Block('p1', False, False, 3, 2)
-    parallel2 = Parallel_Block('p2', False, False, 3, 2)
-
-    rbd.add_block(bloc1)
-    rbd.add_block(parallel)
-    rbd.add_block(parallel2)
-    rbd.blocks[0].add_path(parallel)
+   
     persistent_data['rbd'] = rbd
 
     return True
@@ -33,6 +46,8 @@ def create_rbd():
 
 @eel.expose
 def get_rbd():
+    print(persistent_data)
+
     print('to json')
     print(persistent_data['rbd'].to_json())
     return persistent_data['rbd'].to_json()
@@ -84,7 +99,7 @@ def attach_chain(data):
     block = search_block(data)
     if block.embedded_chain:
         return block.embedded_chain.chainid
-        
+
     chainid = str(random.randint(1, 10000))
     while chainid in persistent_data['chains'].keys():
         chainid = str(random.randint(1, 10000))
