@@ -93,8 +93,6 @@ export default {
       eel.get_initial_data(document.location.pathname)(a => {
         // console.log(a);
         this.graph = this.loadFromJson(a);
-        console.log(this.selectedStates)
-        console.log('bin')
 
         this.selectStates(this.selectedStates)
         

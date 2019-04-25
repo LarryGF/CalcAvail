@@ -3,7 +3,6 @@
     <v-flex xs10 >
       <div class="text-xs-center">
         <!-- <img src="/v.png" alt="Vuetify.js" class="mb-5" /> -->
-        <VuetoNuxtLogo/>
       </div>
       <br>
       <br>
@@ -11,11 +10,7 @@
       <v-card max-width="800">
         <v-card-title class="headline ">Welcome to AvailabiliCalc</v-card-title>
         <v-card-text >
-          AvailabiliCalc is a software built to allow the user to estimate the availability of a Data Center
-          from very early stages in the DC design. It uses the Python library AvailabiliPy to do all the calculations and 
-          uses Nuxt.js and Vue.js to provide a clean, easy to use frontend. For more information about how to use it, visit 
-          the <nuxt-link to='/FAQ'>Guide</nuxt-link>, or, if you are already familiar with the software click the <b>Start</b>
-          button to start working.
+      
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -28,14 +23,11 @@
 </template>
 
 <script>
-import VuetoNuxtLogo from "../components/NuxtLogo";
 export default {
   data: function() {
     return {};
   },
-  components: {
-    VuetoNuxtLogo
-  },
+
   methods: {
     createChain: async function() {
       eel.create_chain()(result => this.$router.push("/markov/" + result));
