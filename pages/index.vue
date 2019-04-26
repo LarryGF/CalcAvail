@@ -9,8 +9,8 @@
       <br>
       <br>
       <v-card max-width="800">
-        <v-card-title class="headline ">Welcome to AvailabiliCalc</v-card-title>
-        <v-card-text >
+        <v-card-title class="display-1">Welcome to AvailabiliCalc</v-card-title>
+        <v-card-text class="subheading">
           AvailabiliCalc is a software built to allow the user to estimate the availability of a Data Center
           from very early stages in the DC design. It uses the Python library AvailabiliPy to do all the calculations and 
           uses Nuxt.js and Vue.js to provide a clean, easy to use frontend. For more information about how to use it, visit 
@@ -19,7 +19,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="createRBD">Start</v-btn>
+          <v-btn color="primary" @click="createRBD()">Start</v-btn>
           <!-- <v-btn color="primary" flat nuxt to="/inspire">Continue</v-btn> -->
         </v-card-actions>
       </v-card>
@@ -37,10 +37,9 @@ export default {
     VuetoNuxtLogo
   },
   methods: {
-    createChain: async function() {
-      eel.create_chain()(result => this.$router.push("/markov/" + result));
-    },
+    
     createRBD: async function() {
+      console.log('here')
       eel.create_rbd()(
         result => console.log(result),
         this.$router.push("/rbd_main")

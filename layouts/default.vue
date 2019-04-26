@@ -91,6 +91,7 @@ export default {
     };
   },
   mounted: function(){
+    console.log(this.$router)
   },
   
   methods: {
