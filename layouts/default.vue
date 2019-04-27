@@ -40,8 +40,14 @@
       </v-btn>-->
       <v-toolbar-title v-text="title" ></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn  absolute fab bottom right icon color="pink" @click.stop="refresh">
-        <v-icon>refresh</v-icon>
+      <v-btn class="mx-3 mt-5"  fab bottom right icon color="blue" @click.stop="save">
+        <v-icon>backup</v-icon>
+      </v-btn>
+      <v-btn class="mx-3 mt-5 pl-5"  fab bottom right icon color="green" @click.stop="load">
+        <v-icon>launcher</v-icon>
+      </v-btn>
+      <v-btn class="mx-3 mt-5"  fab bottom right icon color="pink" @click.stop="refresh">
+        <v-icon>cached</v-icon>
       </v-btn>
     </v-toolbar>
     <v-content >
@@ -81,7 +87,7 @@ export default {
       items: [
         { icon: "apps", title: "Welcome", to: "/" },
         { icon: "bubble_chart", title: "RBD", to: "/rbd_main" },
-        { icon: "settings", title: "Settings", to: "/Settings" },
+        // { icon: "settings", title: "Settings", to: "/Settings" },
         { icon: "help", title: "Guide", to: "/FAQ" },
       ],
       miniVariant: false,
@@ -97,6 +103,15 @@ export default {
   methods: {
     refresh: function() {
       document.location.reload();
+    },
+    save: async function () {
+      eel.save()((result) =>console.log(result)  )
+      
+      
+    },
+    load: async function () {
+      eel.load()((result) => console.log(result) )
+      this.$router.push('/rbd_main')
     }
   }
 };

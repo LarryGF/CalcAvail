@@ -11,7 +11,7 @@
       @close="delete_dialog=false"
       @delete="delete_element"
     />
-
+    <SnackBar :text="snackBarText" :snackbar="openSnackBar" @close="openSnackBar=false"/>
     <!-- <SelectDialog
       :select_dialog="select_dialog"
       :items="graph.blocks"
@@ -53,10 +53,13 @@ import RBD from "../components/RBD";
 import AddBlockDialog from "../components/AddBlockDialog";
 import AddPathDialog from "../components/AddPathDIalog"
 import AttachChainDialog from "../components/AttachChainDialog"
+import SnackBar from "../components/SnackBar"
 
 export default {
   data: function() {
     return {
+      snackBarText:'loren',
+      openSnackBar:false,
       attachChain:false,
       delete_dialog:false,
       availability: "?",
@@ -92,7 +95,8 @@ export default {
     RBD,
     AddBlockDialog,
     AddPathDialog,
-    AttachChainDialog
+    AttachChainDialog,
+    SnackBar
   },
   
   mounted: function() {
@@ -111,9 +115,7 @@ export default {
       let that = this;
       eel.get_rbd()(a => {
         this.graph = this.loadFromJson(a);
-        console.log("graph");
-        console.log(this.graph);
-
+        
         this.run_simulation();
       });
     },
@@ -184,23 +186,23 @@ export default {
     addBlock: async function(data) {
       this.dialog = false;
       eel.add_block(data.value, "B" + String(this.stateNumber), data.active)(
-        result => console.log(result)
+        result => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }}
       );
       this.stateNumber++;
       this.loadInitial();
       this.run_simulation();
-      // eel.add_block("S" + String(this.stateNumber))((result) => console.log(result))
-      // this.stateNumber++;
-      // this.getData()
-      // this.run_simulation();
+      
     },
     addPath: function(data) {
       this.path_dialog = false;
-      // eel.add_transition(data.fromState, data.toState, data.rate)(result =>
-      //   console.log(result)
-      // );
-      // this.getData();
-      eel.add_path(data.from,data.to)((result) => console.log(result))
+      
+      eel.add_path(data.from,data.to)((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }})
       this.loadInitial();
       this.run_simulation();
     },
@@ -228,15 +230,26 @@ export default {
       this.delete_dialog = false;
       if (this.delete_title === "path") {
         this.delete_title = "";
-        eel.del_path(data)(result => console.log(result));
+        eel.del_path(data)(result => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }});
       } else if (this.delete_title === "block") {
-        eel.del_block(data)(result => console.log(result));
+        eel.del_block(data)(result => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }});
       }
       this.loadInitial();
     },
 
     solve: function() {
-      // eel.solve_chain()(result => (this.availability = result));
+      eel.solve_rbd()(result => {if(result[1] != true){
+this.snackBarText = result[0]
+        this.openSnackBar = true
+      }else{
+        this.availability = result[0]
+      }});
     },
     attachChainToBlock: function (data){
       eel.attach_chain(data)((result) => this.$router.push('/markov/'+ result))

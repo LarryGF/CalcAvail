@@ -15,26 +15,34 @@ eel.init('dist')
 #################################### General ########################################################################
 @eel.expose
 def save():
-    file = open('save.json', 'w')
-    data = {
-        'rbd': persistent_data['rbd'].to_json(),
-        'chains': {persistent_data['chains'][chain].chainid: persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']}
-    }
-    json.dump(data, file)
-    file.close()
-    return True
+    try:
+        file = open('save.json', 'w')
+        data = {
+            'rbd': persistent_data['rbd'].to_json(),
+            'chains': {persistent_data['chains'][chain].chainid: persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']}
+        }
+        json.dump(data, file)
+        file.close()
+        return True
+        
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def load():
-    file = open('save.json')
-    data = json.load(file)
-    file.close()
-    create_rbd()
-    load_blocks(data['rbd']['blocks'])
-    load_links(data['rbd']['links'])
-    load_chains(data['chains'],data['rbd']['blocks'])
-    return True
+    try:
+        file = open('save.json')
+        data = json.load(file)
+        file.close()
+        create_rbd()
+        load_blocks(data['rbd']['blocks'])
+        load_links(data['rbd']['links'])
+        load_chains(data['chains'], data['rbd']['blocks'])
+        return True
+
+    except Exception as e:
+        return str(e)
 
 
 def load_blocks(blocks):
@@ -66,10 +74,8 @@ def load_chains(chains, blocks):
                 print(link)
                 from_node = current_chain.nodes[link['source']]
                 to_node = current_chain.nodes[link['target']]
-                add_transition(from_node.nodeid,to_node.nodeid,link['ratio'])
+                add_transition(from_node.nodeid, to_node.nodeid, link['ratio'])
 
-
-        
         else:
             pass
 
@@ -78,85 +84,120 @@ def load_chains(chains, blocks):
 
 @eel.expose
 def create_rbd():
-    if persistent_data['rbd']:
+    try:
+        if persistent_data['rbd']:
+            return True
+
+        rbd = RBD('rbd')
+
+        persistent_data['rbd'] = rbd
+
         return True
 
-    rbd = RBD('rbd')
-
-    persistent_data['rbd'] = rbd
-
-    return True
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def get_rbd():
-    print(persistent_data)
+    try:
+        print(persistent_data)
 
-    print('to json')
-    print(persistent_data['rbd'].to_json())
-    return persistent_data['rbd'].to_json()
+        print('to json')
+        print(persistent_data['rbd'].to_json())
+        return persistent_data['rbd'].to_json()
+
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def add_block(number, id, active):
-    if int(number) > 1:
-        block = Parallel_Block(id, False, False, number, active)
-    else:
-        block = Block(id, False, False)
-    persistent_data['rbd'].add_block(block)
+    try:
+        if int(number) > 1:
+            block = Parallel_Block(id, False, False, number, active)
+        else:
+            block = Block(id, False, False)
+        persistent_data['rbd'].add_block(block)
+
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def add_path(fromBlock, toBlock):
-    fromB = search_block(fromBlock)
-    toB = search_block(toBlock)
-    print(fromB)
-    print(toB)
-    if toB.outgoing_block == fromB:
-        return False
-    else:
-        fromB.add_path(toB)
-    return True
+    try:
+        fromB = search_block(fromBlock)
+        toB = search_block(toBlock)
+
+        if toB.outgoing_block == fromB:
+            return 'The destination block has an outgoing path to the source block'
+        else:
+            fromB.add_path(toB)
+        return True
+
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def del_path(data):
-    blocks = data.split('=>')
-    block = search_block(blocks[0])
-    to_delete = search_block(blocks[1])
-    block.del_path(to_delete)
-    return True
+    try:
+        blocks = data.split('=>')
+        block = search_block(blocks[0])
+        to_delete = search_block(blocks[1])
+        block.del_path(to_delete)
+        return True
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def del_block(data):
-    block = search_block(data)
-    if block.outgoing_block:
-        block.del_path(block.outgoing_block)
-    for current_block in persistent_data['rbd'].blocks:
-        if current_block.outgoing_block == block:
-            current_block.del_path(current_block.outgoing_block)
+    try:
+        block = search_block(data)
+        if block.outgoing_block:
+            block.del_path(block.outgoing_block)
+        for current_block in persistent_data['rbd'].blocks:
+            if current_block.outgoing_block == block:
+                current_block.del_path(current_block.outgoing_block)
 
-    persistent_data['rbd'].delete_block(data)
-    return True
+        persistent_data['rbd'].delete_block(data)
+        return True
+
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def attach_chain(data):
     global current_chain
-    block = search_block(data)
-    if block.embedded_chain:
-        return block.embedded_chain.chainid
+    try:
+        block = search_block(data)
+        if block.embedded_chain:
+            return block.embedded_chain.chainid
 
-    chainid = str(random.randint(1, 10000))
-    while chainid in persistent_data['chains'].keys():
         chainid = str(random.randint(1, 10000))
-    current_chain = MarkovChain(chainid)
-    persistent_data['chains'][chainid] = current_chain
-    block.embed_chain(current_chain)
+        while chainid in persistent_data['chains'].keys():
+            chainid = str(random.randint(1, 10000))
+        current_chain = MarkovChain(chainid)
+        persistent_data['chains'][chainid] = current_chain
+        block.embed_chain(current_chain)
 
-    return chainid
+        return chainid
 
+    except Exception as e:
+        return str(e)
+
+
+@eel.expose
+def solve_rbd():
+    try:
+        persistent_data['rbd'].solve_rbd()
+        return (round(persistent_data['rbd'].availability, 4), True)
+
+    except Exception as e:
+        return (str(e), False)
 
 ############################################# CTMC #################################################################
 # @eel.expose
@@ -174,69 +215,95 @@ def attach_chain(data):
 @eel.expose
 def get_initial_data(route):
     global current_chain
-    current_chain = persistent_data['chains'][route.split('/markov/')[1]]
-    print(current_chain.chainid)
-    print(current_chain.to_json())
-    return current_chain.to_json()
+    try:
+        current_chain = persistent_data['chains'][route.split('/markov/')[1]]
+        print(current_chain.chainid)
+        print(current_chain.to_json())
+        return current_chain.to_json()
+
+    except Exception as e:
+        return str(e)
 
 
 @eel.expose
 def get_data():
-    print(current_chain.chainid)
-    print(current_chain.to_json())
-    return current_chain.to_json()
+    try:
+        print(current_chain.chainid)
+        print(current_chain.to_json())
+        return current_chain.to_json()
 
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def add_node(name):
-    current_chain.add_node(Node(name))
-    return True
+    try:
+        current_chain.add_node(Node(name))
+        return True
 
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def add_transition(from_node, to_node, ratio):
-    from_node = search_node(from_node)
-    if not from_node:
-        return False
-    to_node = search_node(to_node)
-    if not to_node:
-        return False
-    from_node.add_path(to_node, float(ratio))
-    return True
+    try:
+        from_node = search_node(from_node)
+        if not from_node:
+            return False
+        to_node = search_node(to_node)
+        if not to_node:
+            return False
+        from_node.add_path(to_node, float(ratio))
+        return True
 
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def delete_transition(data):
-    nodes = data.split('=>')
-    print(nodes)
-    node = search_node(nodes[0])
-    to_delete = search_node(nodes[1])
-    node.del_path(to_delete)
-    return True
+    try:
+        nodes = data.split('=>')
+        print(nodes)
+        node = search_node(nodes[0])
+        to_delete = search_node(nodes[1])
+        node.del_path(to_delete)
+        return True
 
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def delete_node(data):
-    node = search_node(data)
-    if node:
-        current_chain.del_node(node)
-        return True
-    else:
-        return False
+    try:
+        node = search_node(data)
+        if node:
+            current_chain.del_node(node)
+            return True
+        else:
+            return False
 
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def set_nodelist(nodelist):
-    current_chain.set_nodelist(nodelist)
-    print(current_chain.nodelist)
-    return True
+    try:
+        current_chain.set_nodelist(nodelist)
+        print(current_chain.nodelist)
+        return True
 
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def solve_chain():
-    result = current_chain.get_availability()
+    try:
+        result = current_chain.get_availability()
 
-    return round(result, 4)
+        return (round(result, 4),True)
+
+    except Exception as e:
+        return (str(e),False)
 
 
 def search_node(nodeid):

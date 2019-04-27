@@ -13,6 +13,17 @@
           </v-toolbar>
           <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
         </v-card>
+        <h1>Errors</h1>
+        <v-card v-for="card in cardsError" :key="card.key" light width="1000" class="mb-4">
+          <v-toolbar card :color="card.color" dark @click="hide(card)">
+            <v-toolbar-title ><v-icon>{{card.icon}}</v-icon> {{card.title}}</v-toolbar-title>
+              <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn icon @click="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+          <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
+        </v-card>
         <h1>RBD</h1>
         <v-card v-for="card in cardsRbd" :key="card.key" light width="1000" class="mb-4">
           <v-toolbar card :color="card.color" dark @click="hide(card)">
@@ -117,8 +128,9 @@ export default {
           key:0,
           title:'Saving and loading',
           color:'blue-grey darken-1',
-          text:"In the 'Settings' tab you will find the option to Save and Load your project. It saves the entire project \
-          in a file located in the project's root folder called 'save.json'.",
+          text:"In the top right corner you'll find two buttons for saving and loading your project. The blue floating \
+          action button will save your current work as is. The green floating action button will load the previously saved project\
+          and will take you to the main RBD view.",
           icon:'backup', 
           icon2:'expand_more',
           show:false
@@ -132,6 +144,29 @@ export default {
           issues, some elements being positioned on top of each other and such. For that reason there's a pink floating action button\
           on the top right corner of the screen, clicking it will refresh the view and force the page to re render and the components will\
           be rearranged. You could also press the 'F5' key, whatever is easier.",
+          icon:'refresh', 
+          icon2:'expand_more',
+          show:false
+
+        },
+      ],
+      cardsError:[
+        {
+          key:0,
+          title:'You need to define a list with all available nodes and that list can not be empty',
+          color:'red darken-1',
+          text:"Probably one or more of the embedded CTMC has not been solved. For that double click each block of the RBD\
+          and verify that each CTMC has an availability score",
+          icon:'error', 
+          icon2:'expand_more',
+          show:false
+
+        },
+        {
+          key:1,
+          title:'The destination block has an outgoing path to the source block',
+          color:'red darken-3',
+          text:"Paths in RBD are one way only, so you can't add a path from source to target and from target to source.",
           icon:'refresh', 
           icon2:'expand_more',
           show:false

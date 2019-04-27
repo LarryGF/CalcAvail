@@ -42,10 +42,14 @@ import Dialog from "../../components/Dialog";
 import DeleteDialog from "../../components/Delete_dialog";
 import SelectDialog from "../../components/SelectDialog"
 import MarkovChain from "../../components/MarkovChain"
+import SnackBar from "../../components/SnackBar"
+
 
 export default {
   data: function() {
     return {
+      snackBarText:'loren',
+      openSnackBar:false,
       availability:'?',
       dialog: false,
       delete_dialog: false,
@@ -184,14 +188,20 @@ export default {
     
     },
     addNode: async function() {
-      eel.add_node("S" + String(this.stateNumber))((result) => console.log(result))
+      eel.add_node("S" + String(this.stateNumber))((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }})
       this.stateNumber++;
       this.getData()
       // this.run_simulation();
     },
     addTransition: function(data) {
       this.dialog = false;
-      eel.add_transition(data.fromState,data.toState,data.rate)((result) => console.log(result))
+      eel.add_transition(data.fromState,data.toState,data.rate)((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }})
       this.getData()
     },
 
@@ -215,9 +225,15 @@ export default {
       this.delete_dialog = false;
       if (this.delete_title === "transition") {
         this.delete_title = "";
-        eel.delete_transition(data)((result) => console.log(result))
+        eel.delete_transition(data)((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }})
       } else if (this.delete_title === "node") {
-        eel.delete_node(data)((result) => console.log(result))
+        eel.delete_node(data)((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }})
       }
         this.getData()
 
@@ -240,7 +256,10 @@ export default {
         }
         this.select_dialog = false
         this.selectedStates = data
-        eel.set_nodelist(this.selectedStates)((result) => console.log(result))
+        eel.set_nodelist(this.selectedStates)((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }})
         if(this.selectedStates.length >0){
 
           this.solve()
@@ -249,7 +268,12 @@ export default {
     },
 
     solve: function(){
-      eel.solve_chain()((result) => this.availability=result)
+      eel.solve_chain()((result) => {if (result[1] != true){
+        this.snackBarText = result[0]
+        this.openSnackBar = true
+      }else{
+        this.availability=result[0]
+      }})
     }
     
   }
