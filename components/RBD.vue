@@ -57,7 +57,7 @@
         ></rect>
 
         <rect
-          v-for="i in item.amount"
+          v-for="i in item.valid +1"
           :key="'small'+i"
           width="80"
           height="40"
@@ -66,6 +66,20 @@
           :x="item.x+10"
           :y="adjustRectHeight(item,i)"
           fill="yellow"
+          @dblclick="goChain(item)"
+
+        ></rect>
+
+        <rect
+          v-for="i in (item.amount -item.valid) +1"
+          :key="'small'+i"
+          width="80"
+          height="40"
+          rx="10"
+          ry="10"
+          :x="item.x+10"
+          :y="adjustRectHeight(item,i)"
+          fill="#fff"
           @dblclick="goChain(item)"
 
         ></rect>

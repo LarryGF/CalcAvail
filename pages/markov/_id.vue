@@ -8,6 +8,7 @@
       @close="delete_dialog=false"
       @delete="delete_element"
     />
+    <SnackBar :text="snackBarText" :snackbar="openSnackBar" @close="openSnackBar=false"/>
 
     <SelectDialog
       :select_dialog="select_dialog"

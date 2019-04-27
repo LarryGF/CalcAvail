@@ -379,7 +379,7 @@ class RBD:
                 'id': n.blockid,
                 'amount': n.amount,
                 'chainid': n.embedded_chain.chainid if n.embedded_chain else None,
-                'valid': n.valid if type(n)==Parallel_Block else None
+                'valid': n.valid if type(n)==Parallel_Block else 0
             } for n in self.blocks],
 
             'links': [

@@ -51,6 +51,8 @@
       </v-btn>
     </v-toolbar>
     <v-content >
+    <SnackBar :text="snackBarText" :snackbar="openSnackBar" @close="openSnackBar=false"/>
+
       <v-container class="pb-1 pt-3">
         <nuxt/>
       </v-container>
@@ -78,9 +80,12 @@
 </template>
 
 <script>
+import SnackBar from "../components/SnackBar"
 export default {
   data() {
     return {
+      snackBarText:'loren',
+      openSnackBar:false,
       clipped: false,
       drawer: true,
       fixed: true,
@@ -99,18 +104,27 @@ export default {
   mounted: function(){
     console.log(this.$router)
   },
+  components:{
+    SnackBar
+  },
   
   methods: {
     refresh: function() {
       document.location.reload();
     },
     save: async function () {
-      eel.save()((result) =>console.log(result)  )
+      eel.save()((result) =>{if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }}  )
       
       
     },
     load: async function () {
-      eel.load()((result) => console.log(result) )
+      eel.load()((result) => {if (result != true){
+        this.snackBarText = result
+        this.openSnackBar = true
+      }} )
       this.$router.push('/rbd_main')
     }
   }
