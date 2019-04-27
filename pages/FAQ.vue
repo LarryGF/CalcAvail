@@ -24,6 +24,17 @@
           </v-toolbar>
           <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
         </v-card>
+        <h1>Known Bugs</h1>
+        <v-card v-for="card in cardsBug" :key="card.key" light width="1000" class="mb-4">
+          <v-toolbar card :color="card.color" dark @click="hide(card)">
+            <v-toolbar-title ><v-icon>{{card.icon}}</v-icon> {{card.title}}</v-toolbar-title>
+              <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn icon @click="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+          <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
+        </v-card>
         <h1>RBD</h1>
         <v-card v-for="card in cardsRbd" :key="card.key" light width="1000" class="mb-4">
           <v-toolbar card :color="card.color" dark @click="hide(card)">
@@ -166,6 +177,30 @@ export default {
           key:1,
           title:'The destination block has an outgoing path to the source block',
           color:'red darken-3',
+          text:"Paths in RBD are one way only, so you can't add a path from source to target and from target to source.",
+          icon:'refresh', 
+          icon2:'expand_more',
+          show:false
+
+        },
+      ],
+      cardsBug:[
+        {
+          key:0,
+          title:'Adding paths in the RBD',
+          color:'purple darken-1',
+          text:"In the RBD view, while adding a path, it must be done in order. You should only draw a path between two \
+          adjacent blocks, if it's not done this way, the blocks will try to reacomodate themselves accordingly and they might \
+          end in front of each other.",
+          icon:'bug_report', 
+          icon2:'expand_more',
+          show:false
+
+        },
+        {
+          key:1,
+          title:'The destination block has an outgoing path to the source block',
+          color:'purple darken-3',
           text:"Paths in RBD are one way only, so you can't add a path from source to target and from target to source.",
           icon:'refresh', 
           icon2:'expand_more',
