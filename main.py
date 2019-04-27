@@ -119,6 +119,7 @@ def add_block(number, id, active):
         else:
             block = Block(id, False, False)
         persistent_data['rbd'].add_block(block)
+        return True
 
     except Exception as e:
         return str(e)

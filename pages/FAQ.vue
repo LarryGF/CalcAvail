@@ -178,7 +178,7 @@ export default {
           title:'The destination block has an outgoing path to the source block',
           color:'red darken-3',
           text:"Paths in RBD are one way only, so you can't add a path from source to target and from target to source.",
-          icon:'refresh', 
+          icon:'error', 
           icon2:'expand_more',
           show:false
 
@@ -199,10 +199,12 @@ export default {
         },
         {
           key:1,
-          title:'The destination block has an outgoing path to the source block',
+          title:'Maximum blocks allowed',
           color:'purple darken-3',
-          text:"Paths in RBD are one way only, so you can't add a path from source to target and from target to source.",
-          icon:'refresh', 
+          text:"In a 15.6' screen with 1920x1080 resolution, the maximum amount of blocks that can be present at the same time\
+          is 12, with more than that the blocks will overlap. A posible fix for that would be augmenting the screen resolution \
+          or screen size.",
+          icon:'bug_report', 
           icon2:'expand_more',
           show:false
 
