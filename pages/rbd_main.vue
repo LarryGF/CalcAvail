@@ -133,6 +133,13 @@ export default {
         json.blocks[node].vy = 0;
         json.blocks[node].color = "#fff";
       }
+      
+      var blockids = json.blocks.map((block)=>block.id)
+      blockids = blockids.sort()[blockids.length-1]
+      blockids = blockids.replace('B','')
+      this.stateNumber = parseInt(blockids)+1
+      console.log('number')
+      console.log(this.stateNumber)
 
       return json;
     },
