@@ -139,6 +139,13 @@ export default {
 
       this.selectedStates = json.selected_states
 
+      var nodeids = json.nodes.map((node)=>node.id)
+      console.log('number')
+      console.log(nodeids)
+      nodeids = nodeids.sort()[nodeids.length-1]
+      nodeids = nodeids.replace('S','')
+      this.stateNumber = parseInt(nodeids)+1
+
       return json;
     },
     tick: function() {
