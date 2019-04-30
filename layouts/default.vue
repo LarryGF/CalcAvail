@@ -98,7 +98,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: "Markovify"
+      title: "AvailabiliCalc"
     };
   },
   mounted: function(){

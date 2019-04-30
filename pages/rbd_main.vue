@@ -73,11 +73,7 @@ export default {
       graph: {
         blocks: [],
         links: [
-          {
-            id:0,
-            source:0,
-            target:1
-          }
+          
         ]
       },
       simulation: null,
@@ -114,6 +110,7 @@ export default {
     loadInitial: function() {
       let that = this;
       eel.get_rbd()(a => {
+        console.log(a)
         this.graph = this.loadFromJson(a);
         
         this.run_simulation();

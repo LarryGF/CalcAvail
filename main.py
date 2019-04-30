@@ -105,6 +105,13 @@ def get_rbd():
 
         print('to json')
         print(persistent_data['rbd'].to_json())
+        print('hey')
+        print(persistent_data['rbd'])
+        if len(persistent_data['rbd'].to_json())==0:
+            block = Block('B0')
+            persistent_data['rbd'].add_block(block)
+
+        
         return persistent_data['rbd'].to_json()
 
     except Exception as e:
@@ -201,16 +208,6 @@ def solve_rbd():
         return (str(e), False)
 
 ############################################# CTMC #################################################################
-# @eel.expose
-# def create_chain():
-    # global current_chain
-#     chainid = str(random.randint(1, 10000))
-#     while chainid in persistent_data['chains'].keys():
-#         chainid = str(random.randint(1, 10000))
-    # current_chain = MarkovChain(chainid)
-    # persistent_data['chains'][chainid] = current_chain
-
-#     return chainid
 
 
 @eel.expose
