@@ -132,18 +132,22 @@ export default {
         json.blocks[node].vx = 0;
         json.blocks[node].vy = 0;
         json.blocks[node].color = "#fff";
+        
         if (json.blocks[node].availability == null){
           json.blocks[node].availability = 0
         }
       }
-      
+      console.log('json')
+      console.log(json)
+      if (json.blocks.length !==0){
       var blockids = json.blocks.map((block)=>block.id)
       blockids = blockids[blockids.length-1]
-      blockids = blockids.replace('B','')
+
+        blockids = blockids.replace('B','')
       this.stateNumber = parseInt(blockids)+1
+      }
       console.log('number')
       console.log(this.stateNumber)
-
       return json;
     },
     tick: function() {
@@ -169,7 +173,9 @@ export default {
     },
     run_simulation: function() {
       var that = this;
-      var increment = that.settings.svgWigth / that.graph.blocks.length;
+      if (that.graph.blocks){
+
+        var increment = that.settings.svgWigth / that.graph.blocks.length;
 
       that.simulation = d3
         .forceSimulation(that.graph.blocks)
@@ -188,6 +194,7 @@ export default {
         that.graph.blocks[0].x = 10;
       that.graph.blocks[that.graph.blocks.length - 1].x =
         that.settings.svgWigth - 110;
+      }
       }
     },
     addBlock: async function(data) {

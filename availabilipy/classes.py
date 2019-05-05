@@ -46,7 +46,7 @@ class MarkovChain:
         self.nodes: List[Node] = []
         self.chainid = chainid
         self.nodelist = []
-        self.availability = None
+        self.availability = 0
 
     def add_node(self, node: Node):
         self.nodes.append(node)
@@ -374,13 +374,13 @@ class RBD:
         return self.availability
 
     def to_json(self):
-    
+        
         pos = { block.blockid:i for i, block in enumerate(self.blocks)}
         return {
             'blocks': [{
                 'id': n.blockid,
                 'amount': n.amount,
-                'availability': round(n.embedded_chain.availability,4) if n.embedded_chain.availability else None,
+                'availability': round(n.embedded_chain.availability,4) if n.embedded_chain else None,
                 'chainid': n.embedded_chain.chainid if n.embedded_chain else None,
                 'valid': n.valid if type(n)==Parallel_Block else 0
             } for n in self.blocks],

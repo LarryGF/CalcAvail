@@ -121,13 +121,14 @@ def get_rbd():
         print('to json')
         print(persistent_data['rbd'].to_json())
        
-        if len(persistent_data['rbd'].to_json())==0:
-            block = Block('B0')
-            persistent_data['rbd'].add_block(block)
+        # if len(persistent_data['rbd'].to_json())==0:
+        #     block = Block('B0')
+        #     persistent_data['rbd'].add_block(block)
 
         return persistent_data['rbd'].to_json()
 
     except Exception as e:
+        print(str(e))
         return str(e)
 
 

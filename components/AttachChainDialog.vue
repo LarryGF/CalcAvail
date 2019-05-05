@@ -49,7 +49,12 @@ export default {
     stateIds: []
   }),
   watch: {
-    items: function () {this.stateIds = this.items.map((state) => state.id)}
+    items: function () {
+      if (this.items){
+
+        this.stateIds = this.items.map((state) => state.id)
+      }
+      }
   },
  
   methods: {

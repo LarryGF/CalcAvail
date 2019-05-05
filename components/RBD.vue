@@ -35,7 +35,7 @@
           :x="item.x +39"
           :y="adjustRectHeight(item,0.7)"
           class="nodelabel"
-        >{{item.availability}}</text>
+        >A: {{item.availability}}</text>
         <rect
           v-if="item.amount>1"
           width="100"
@@ -139,7 +139,6 @@ export default {
   //   // }
   // },
   mounted: function () {
-    console.log(this.graph)
   },
   methods: {
     adjustRectHeight: function(item, i) {
