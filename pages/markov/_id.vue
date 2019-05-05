@@ -141,9 +141,15 @@ export default {
 
       var nodeids = json.nodes.map((node)=>node.id)
       console.log('number')
+      console.log(nodeids[nodeids.length-1])
+      nodeids = nodeids[nodeids.length-1]
+
       console.log(nodeids)
-      nodeids = nodeids.sort()[nodeids.length-1]
+
       nodeids = nodeids.replace('S','')
+      console.log('without')
+      console.log(nodeids)
+
       this.stateNumber = parseInt(nodeids)+1
 
       return json;

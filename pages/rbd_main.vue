@@ -135,7 +135,7 @@ export default {
       }
       
       var blockids = json.blocks.map((block)=>block.id)
-      blockids = blockids.sort()[blockids.length-1]
+      blockids = blockids[blockids.length-1]
       blockids = blockids.replace('B','')
       this.stateNumber = parseInt(blockids)+1
       console.log('number')

@@ -19,7 +19,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-toolbar fixed app :clipped-left="clipped">
-      <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
+      <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
       <!-- <v-btn
         icon
         @click.stop="miniVariant = !miniVariant"
@@ -87,7 +87,7 @@ export default {
       snackBarText:'loren',
       openSnackBar:false,
       clipped: false,
-      drawer: true,
+      drawer: false,
       fixed: true,
       items: [
         { icon: "apps", title: "Welcome", to: "/" },
