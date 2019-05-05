@@ -132,6 +132,9 @@ export default {
         json.blocks[node].vx = 0;
         json.blocks[node].vy = 0;
         json.blocks[node].color = "#fff";
+        if (json.blocks[node].availability == null){
+          json.blocks[node].availability = 0
+        }
       }
       
       var blockids = json.blocks.map((block)=>block.id)

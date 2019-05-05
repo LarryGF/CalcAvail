@@ -1,7 +1,9 @@
 import eel
 import random
 import json
+import os
 from availabilipy.classes import *
+
 
 persistent_data = {
     'chains': {},
@@ -14,9 +16,12 @@ eel.init('dist')
 
 #################################### General ########################################################################
 @eel.expose
-def save():
+def save(name):
+    print("Saving to json")
+    if os.path.exists(name + '.json'):
+        return 'That file already exists'
     try:
-        file = open('save.json', 'w')
+        file = open(name+'.json', 'w')
         data = {
             'rbd': persistent_data['rbd'].to_json(),
             'chains': {persistent_data['chains'][chain].chainid: persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']}
@@ -31,6 +36,7 @@ def save():
 
 @eel.expose
 def load():
+    print("Loading from json")
     try:
         file = open('save.json')
         data = json.load(file)
@@ -46,17 +52,25 @@ def load():
 
 
 def load_blocks(blocks):
+    print("Loading blocks")
+
     for block in blocks:
         add_block(block['amount'], block['id'], block['valid'])
-
+        test_block = search_block(block['id'])
+        
+        test_block.block_availability =  block['availability']
+        
 
 def load_links(links):
+    print("Loading links")
+
     for link in links:
         add_path(persistent_data['rbd'].blocks[link['source']].blockid,
                  persistent_data['rbd'].blocks[link['target']].blockid)
 
 
 def load_chains(chains, blocks):
+    print("Loading chains")
     global current_chain
     for block in blocks:
         chainid = block['chainid']
@@ -65,13 +79,12 @@ def load_chains(chains, blocks):
             current_chain = MarkovChain(chainid)
             persistent_data['chains'][chainid] = current_chain
             current_block.embed_chain(current_chain)
+            current_chain.availability = current_block.block_availability
             chain_specs = chains[chainid]
             for node in chain_specs['nodes']:
                 add_node(node['id'])
 
             for link in chain_specs['links']:
-                print('link')
-                print(link)
                 from_node = current_chain.nodes[link['source']]
                 to_node = current_chain.nodes[link['target']]
                 add_transition(from_node.nodeid, to_node.nodeid, link['ratio'])
@@ -84,6 +97,7 @@ def load_chains(chains, blocks):
 
 @eel.expose
 def create_rbd():
+    print('Creating rbd')
     try:
         if persistent_data['rbd']:
             return True
@@ -100,6 +114,7 @@ def create_rbd():
 
 @eel.expose
 def get_rbd():
+    print('Getting RBD')
     try:
         print(persistent_data)
 
@@ -118,6 +133,7 @@ def get_rbd():
 
 @eel.expose
 def add_block(number, id, active):
+    print('Adding Block')
     try:
         if int(number) > 1:
             block = Parallel_Block(id, False, False, number, active)
@@ -132,6 +148,7 @@ def add_block(number, id, active):
 
 @eel.expose
 def add_path(fromBlock, toBlock):
+    print('Adding path')
     try:
         fromB = search_block(fromBlock)
         toB = search_block(toBlock)
@@ -148,6 +165,7 @@ def add_path(fromBlock, toBlock):
 
 @eel.expose
 def del_path(data):
+    print('Deleting path')
     try:
         blocks = data.split('=>')
         block = search_block(blocks[0])
@@ -160,6 +178,7 @@ def del_path(data):
 
 @eel.expose
 def del_block(data):
+    print('Deleting block')
     try:
         block = search_block(data)
         if block.outgoing_block:
@@ -178,6 +197,7 @@ def del_block(data):
 @eel.expose
 def attach_chain(data):
     global current_chain
+    print('Attaching Chain')
     try:
         block = search_block(data)
         if block.embedded_chain:
@@ -198,6 +218,7 @@ def attach_chain(data):
 
 @eel.expose
 def solve_rbd():
+    print('Solving RBD')
     try:
         persistent_data['rbd'].solve_rbd()
         return (round(persistent_data['rbd'].availability, 4), True)
@@ -210,6 +231,7 @@ def solve_rbd():
 
 @eel.expose
 def get_initial_data(route):
+    print('Getting chain for the first time')
     global current_chain
     try:
         current_chain = persistent_data['chains'][route.split('/markov/')[1]]
@@ -223,6 +245,7 @@ def get_initial_data(route):
 
 @eel.expose
 def get_data():
+    print('Getting Chain')
     try:
         print(current_chain.chainid)
         print(current_chain.to_json())
@@ -233,6 +256,7 @@ def get_data():
 
 @eel.expose
 def add_node(name):
+    print('Adding node')
     try:
         current_chain.add_node(Node(name))
         return True
@@ -242,6 +266,7 @@ def add_node(name):
 
 @eel.expose
 def add_transition(from_node, to_node, ratio):
+    print('Adding transition')
     try:
         from_node = search_node(from_node)
         if not from_node:
@@ -257,6 +282,7 @@ def add_transition(from_node, to_node, ratio):
 
 @eel.expose
 def delete_transition(data):
+    print('Deleting transition')
     try:
         nodes = data.split('=>')
         print(nodes)
@@ -270,19 +296,21 @@ def delete_transition(data):
 
 @eel.expose
 def delete_node(data):
+    print('Deleting node')
     try:
         node = search_node(data)
         if node:
             current_chain.del_node(node)
             return True
         else:
-            return False
+            return "You haven't selected a node"
 
     except Exception as e:
         return str(e)
 
 @eel.expose
 def set_nodelist(nodelist):
+    print('Setting available nodes')
     try:
         current_chain.set_nodelist(nodelist)
         print(current_chain.nodelist)
@@ -293,6 +321,7 @@ def set_nodelist(nodelist):
 
 @eel.expose
 def solve_chain():
+    print('Solving chain')
     try:
         result = current_chain.get_availability()
 

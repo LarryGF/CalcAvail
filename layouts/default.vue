@@ -1,5 +1,6 @@
 <template>
   <v-app dark>
+    <SaveDialog :save_dialog="save_dialog" @save="save" @close="save_dialog=false"></SaveDialog>
     <v-navigation-drawer
       :mini-variant.sync="miniVariant"
       :clipped="clipped"
@@ -40,7 +41,7 @@
       </v-btn>-->
       <v-toolbar-title v-text="title" ></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn class="mx-3 mt-5"  fab bottom right icon color="blue" @click.stop="save">
+      <v-btn class="mx-3 mt-5"  fab bottom right icon color="blue" @click.stop="save_dialog=true">
         <v-icon>backup</v-icon>
       </v-btn>
       <v-btn class="mx-3 mt-5 pl-5"  fab bottom right icon color="green" @click.stop="load">
@@ -81,13 +82,15 @@
 
 <script>
 import SnackBar from "../components/SnackBar"
+import SaveDialog from "../components/SaveDialog"
 export default {
   data() {
     return {
+      save_dialog:false,
       snackBarText:'loren',
       openSnackBar:false,
       clipped: false,
-      drawer: false,
+      drawer: true,
       fixed: true,
       items: [
         { icon: "apps", title: "Welcome", to: "/" },
@@ -105,19 +108,24 @@ export default {
     console.log(this.$router)
   },
   components:{
-    SnackBar
+    SnackBar,
+    SaveDialog
   },
   
   methods: {
     refresh: function() {
       document.location.reload();
     },
-    save: async function () {
-      eel.save()((result) =>{if (result != true){
+    save: async function (item) {
+      eel.save(item)((result) =>{if (result != true){
         this.snackBarText = result
         this.openSnackBar = true
-      }}  )
-      
+      }else{
+        this.snackBarText = "Saved succesfully"
+        this.openSnackBar = true
+      }
+      }  )
+      this.save_dialog = false
       
     },
     load: async function () {

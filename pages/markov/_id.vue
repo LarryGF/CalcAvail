@@ -1,5 +1,6 @@
 <template>
   <v-layout column>
+    <AddNodeDialog :add_dialog="add_dialog" @close="add_dialog=false" @save="addNode"></AddNodeDialog>
     <Dialog :dialog="dialog" :states="graph.nodes" @close="dialog=false" @save="addTransition"/>
     <DeleteDialog
       :delete_dialog="delete_dialog"
@@ -25,7 +26,7 @@
       <v-layout row mt-1>
         <v-btn color="green" @click="select_dialog=true">Solve chain</v-btn>
         <v-spacer></v-spacer>
-        <v-btn @click="addNode"><v-icon>add</v-icon> Add Node</v-btn>
+        <v-btn @click="add_dialog=true"><v-icon>add</v-icon> Add Node</v-btn>
         <v-btn @click="dialog=true"><v-icon>add</v-icon> Add transition</v-btn>
         <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select nodes</v-btn> -->
         <v-btn color="error" @click="delete_dialog_prepare('node')"><v-icon>delete</v-icon>Delete node</v-btn>
@@ -44,11 +45,12 @@ import DeleteDialog from "../../components/Delete_dialog";
 import SelectDialog from "../../components/SelectDialog"
 import MarkovChain from "../../components/MarkovChain"
 import SnackBar from "../../components/SnackBar"
-
+import AddNodeDialog from "../../components/AddNodeDialog"
 
 export default {
   data: function() {
     return {
+      add_dialog:false,
       snackBarText:'loren',
       openSnackBar:false,
       availability:'?',
@@ -79,7 +81,9 @@ export default {
     Dialog,
     DeleteDialog,
     SelectDialog,
-    MarkovChain
+    MarkovChain,
+    SnackBar,
+    AddNodeDialog
   },
   mounted: function() {
     this.loadInitial();
@@ -139,18 +143,18 @@ export default {
 
       this.selectedStates = json.selected_states
 
-      var nodeids = json.nodes.map((node)=>node.id)
-      console.log('number')
-      console.log(nodeids[nodeids.length-1])
-      nodeids = nodeids[nodeids.length-1]
+      // var nodeids = json.nodes.map((node)=>node.id)
+      // console.log('number')
+      // console.log(nodeids[nodeids.length-1])
+      // nodeids = nodeids[nodeids.length-1]
 
-      console.log(nodeids)
+      // console.log(nodeids)
 
-      nodeids = nodeids.replace('S','')
-      console.log('without')
-      console.log(nodeids)
+      // nodeids = nodeids.replace('S','')
+      // console.log('without')
+      // console.log(nodeids)
 
-      this.stateNumber = parseInt(nodeids)+1
+      // this.stateNumber = parseInt(nodeids)+1
 
       return json;
     },
@@ -201,13 +205,21 @@ export default {
 
     
     },
-    addNode: async function() {
-      eel.add_node("S" + String(this.stateNumber))((result) => {if (result != true){
-        this.snackBarText = result
+    addNode: async function(name) {
+      if (this.graph.nodes.map((node) => node.id).includes(name)){
+        this.snackBarText = "There's already a node with that name"
         this.openSnackBar = true
+      } else{
+
+        eel.add_node(name)((result) => {if (result != true){
+          this.snackBarText = result
+        this.openSnackBar = true
+      }else{
+        this.add_dialog = false
+
       }})
-      this.stateNumber++;
       this.getData()
+      }
       // this.run_simulation();
     },
     addTransition: function(data) {

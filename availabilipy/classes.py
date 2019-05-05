@@ -46,6 +46,7 @@ class MarkovChain:
         self.nodes: List[Node] = []
         self.chainid = chainid
         self.nodelist = []
+        self.availability = None
 
     def add_node(self, node: Node):
         self.nodes.append(node)
@@ -116,6 +117,7 @@ class MarkovChain:
         for nodeid in nodelist:
             availability = availability + result[nodeid]
 
+        self.availability =availability
         return availability
 
     def set_nodelist(self, nodelist: list):
@@ -378,6 +380,7 @@ class RBD:
             'blocks': [{
                 'id': n.blockid,
                 'amount': n.amount,
+                'availability': round(n.embedded_chain.availability,4) if n.embedded_chain.availability else None,
                 'chainid': n.embedded_chain.chainid if n.embedded_chain else None,
                 'valid': n.valid if type(n)==Parallel_Block else 0
             } for n in self.blocks],
