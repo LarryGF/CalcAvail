@@ -156,7 +156,7 @@ class Block:
         self.isFirst = isFirst
         self.isLast = isLast
         self.embedded_chain = None
-        self.block_availability = None
+        self.block_availability = 0
         self.amount = 1
 
 
@@ -237,7 +237,7 @@ class Parallel_Block:
         self.isFirst = isFirst
         self.isLast = isLast
         self.embedded_chain = None
-        self.block_availability = None
+        self.block_availability = 0
         self.amount = amount
         self.valid = valid
 

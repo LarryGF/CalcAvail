@@ -4,7 +4,8 @@ import json
 import os
 from availabilipy.classes import *
 
-
+os.makedirs('saves', exist_ok=True)
+save_folder = os.path.join(os.getcwd(),'saves')
 persistent_data = {
     'chains': {},
     'rbd': {}
@@ -21,7 +22,7 @@ def save(name):
     if os.path.exists(name + '.json'):
         return 'That file already exists'
     try:
-        file = open(name+'.json', 'w')
+        file = open(os.path.join(save_folder,name+'.json'), 'w')
         data = {
             'rbd': persistent_data['rbd'].to_json(),
             'chains': {persistent_data['chains'][chain].chainid: persistent_data['chains'][chain].to_json() for chain in persistent_data['chains']}
