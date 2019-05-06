@@ -1,1 +1,0 @@
-{"rbd": {"blocks": [{"id": "B0", "amount": 1, "availability": 2, "chainid": null, "valid": 0}, {"id": "B1", "amount": 2, "availability": 2, "chainid": null, "valid": 1}, {"id": "B2", "amount": 3, "availability": 2, "chainid": null, "valid": 2}], "links": []}, "chains": {}}
