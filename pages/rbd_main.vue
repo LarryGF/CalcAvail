@@ -126,6 +126,9 @@ export default {
     // },
 
     loadFromJson: function(json) {
+      console.log('json')
+      console.log(json)
+
       for (var node in json.blocks) {
         json.blocks[node].x = 0;
         json.blocks[node].y = 100;
@@ -137,8 +140,6 @@ export default {
           json.blocks[node].availability = 0
         }
       }
-      console.log('json')
-      console.log(json)
       if (json.blocks.length !==0){
       var blockids = json.blocks.map((block)=>block.id)
       blockids = blockids[blockids.length-1]

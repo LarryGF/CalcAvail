@@ -284,8 +284,12 @@ class Parallel_Block:
         return
 
     def calc_availability(self):
+
         if self.embedded_chain == None:
-            raise Exception('There is no embedded chain')
+            if not self.block_availability:
+                raise Exception('There is no embedded chain')
+            else:
+                return self.block_availability
 
         if self.embedded_chain.nodelist == None or len(self.embedded_chain.nodelist) == 0:
             raise Exception(
@@ -380,7 +384,7 @@ class RBD:
             'blocks': [{
                 'id': n.blockid,
                 'amount': n.amount,
-                'availability': round(n.embedded_chain.availability,4) if n.embedded_chain else None,
+                'availability':  round(n.block_availability,4) if not n.embedded_chain else round(n.embedded_chain.availability,4),
                 'chainid': n.embedded_chain.chainid if n.embedded_chain else None,
                 'valid': n.valid if type(n)==Parallel_Block else 0
             } for n in self.blocks],

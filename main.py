@@ -59,7 +59,7 @@ def load_blocks(blocks):
         test_block = search_block(block['id'])
         
         test_block.block_availability =  block['availability']
-        
+        print(test_block)
 
 def load_links(links):
     print("Loading links")
