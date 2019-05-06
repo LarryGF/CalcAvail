@@ -203,8 +203,11 @@ class Block:
         return
 
     def calc_availability(self):
-        if self.embedded_chain == None:
-            raise Exception('There is no embedded chain')
+        if not self.block_availability:
+            if self.embedded_chain == None:
+                raise Exception('There is no embedded chain')
+        else:
+            return self.block_availability
 
         if self.embedded_chain.nodelist == None or len(self.embedded_chain.nodelist) == 0:
             raise Exception(
@@ -285,11 +288,11 @@ class Parallel_Block:
 
     def calc_availability(self):
 
-        if self.embedded_chain == None:
-            if not self.block_availability:
+        if not self.block_availability:
+            if self.embedded_chain == None:
                 raise Exception('There is no embedded chain')
-            else:
-                return self.block_availability
+        else:
+            return self.block_availability
 
         if self.embedded_chain.nodelist == None or len(self.embedded_chain.nodelist) == 0:
             raise Exception(

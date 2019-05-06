@@ -2,8 +2,25 @@
   <v-layout column>
     <!-- <Dialog :dialog="dialog" :states="graph.blocks" @close="dialog=false" @save="addTransition"/> -->
     <AddBlockDialog :dialog="dialog" @close="dialog=false" @save="addBlock"/>
-    <AddPathDialog :path_dialog="path_dialog" :blocks="graph.blocks" :links="graph.links" @close="path_dialog=false" @create="addPath"/>
-    <AttachChainDialog :attach_dialog="attachChain" :items="graph.blocks" @close="attachChain=false" @attach="attachChainToBlock"/>
+    <SetAvailabilityDialog
+      :set_dialog="set_dialog"
+      :items="graph.blocks"
+      @close="set_dialog=false"
+      @set="setAvailablity"
+    />
+    <AddPathDialog
+      :path_dialog="path_dialog"
+      :blocks="graph.blocks"
+      :links="graph.links"
+      @close="path_dialog=false"
+      @create="addPath"
+    />
+    <AttachChainDialog
+      :attach_dialog="attachChain"
+      :items="graph.blocks"
+      @close="attachChain=false"
+      @attach="attachChainToBlock"
+    />
     <DeleteDialogRBD
       :delete_dialog="delete_dialog"
       :items="items_to_delete"
@@ -18,7 +35,7 @@
       :selected="selectedStates"
       @close="select_dialog=false"
       @select="selectStates"
-    /> -->
+    />-->
 
     <v-flex xs12>
       <RBD :viewBox="viewBox" :settings="settings" :graph="graph"/>
@@ -30,15 +47,22 @@
         <v-btn @click="dialog=true">
           <v-icon>add</v-icon>Add Block
         </v-btn>
-        <v-btn @click="path_dialog=true"><v-icon>add</v-icon> Add path</v-btn>
+        <v-btn @click="path_dialog=true">
+          <v-icon>add</v-icon>Add path
+        </v-btn>
         <!-- <v-btn color="primary" @click="select_dialog=true"><v-icon>check</v-icon> Select blocks</v-btn> -->
         <v-btn color="primary" @click="attachChain=true">
           <v-icon>attach_file</v-icon>Attach Chain
         </v-btn>
+        <v-btn color="primary" @click="set_dialog=true">
+          <v-icon>memory</v-icon>Set Availability
+        </v-btn>
         <v-btn color="error" @click="delete_dialog_prepare('block')">
           <v-icon>delete</v-icon>Delete block
         </v-btn>
-        <v-btn color="error" @click="delete_dialog_prepare('path')"><v-icon>delete</v-icon>Delete path</v-btn>
+        <v-btn color="error" @click="delete_dialog_prepare('path')">
+          <v-icon>delete</v-icon>Delete path
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn outline>Availability: {{availability}}</v-btn>
       </v-layout>
@@ -51,20 +75,22 @@ import * as d3 from "d3";
 import DeleteDialogRBD from "../components/DeleteDialogRBD";
 import RBD from "../components/RBD";
 import AddBlockDialog from "../components/AddBlockDialog";
-import AddPathDialog from "../components/AddPathDIalog"
-import AttachChainDialog from "../components/AttachChainDialog"
-import SnackBar from "../components/SnackBar"
+import AddPathDialog from "../components/AddPathDIalog";
+import AttachChainDialog from "../components/AttachChainDialog";
+import SnackBar from "../components/SnackBar";
+import SetAvailabilityDialog from "../components/SetAvailabilityDialog";
 
 export default {
   data: function() {
     return {
-      snackBarText:'loren',
-      openSnackBar:false,
-      attachChain:false,
-      delete_dialog:false,
+      set_dialog: false,
+      snackBarText: "loren",
+      openSnackBar: false,
+      attachChain: false,
+      delete_dialog: false,
       availability: "?",
       dialog: false,
-      path_dialog:false,
+      path_dialog: false,
       items_to_delete: [],
       delete_title: "",
       stateNumber: 0,
@@ -72,9 +98,7 @@ export default {
       viewBox: "0 0 960 600",
       graph: {
         blocks: [],
-        links: [
-          
-        ]
+        links: []
       },
       simulation: null,
       color: d3.scaleOrdinal(20),
@@ -92,9 +116,10 @@ export default {
     AddBlockDialog,
     AddPathDialog,
     AttachChainDialog,
+    SetAvailabilityDialog,
     SnackBar
   },
-  
+
   mounted: function() {
     this.loadInitial();
     this.viewBox =
@@ -110,9 +135,9 @@ export default {
     loadInitial: function() {
       let that = this;
       eel.get_rbd()(a => {
-        console.log(a)
+        console.log(a);
         this.graph = this.loadFromJson(a);
-        
+
         this.run_simulation();
       });
     },
@@ -126,8 +151,8 @@ export default {
     // },
 
     loadFromJson: function(json) {
-      console.log('json')
-      console.log(json)
+      console.log("json");
+      console.log(json);
 
       for (var node in json.blocks) {
         json.blocks[node].x = 0;
@@ -135,20 +160,20 @@ export default {
         json.blocks[node].vx = 0;
         json.blocks[node].vy = 0;
         json.blocks[node].color = "#fff";
-        
-        if (json.blocks[node].availability == null){
-          json.blocks[node].availability = 0
+
+        if (json.blocks[node].availability == null) {
+          json.blocks[node].availability = 0;
         }
       }
-      if (json.blocks.length !==0){
-      var blockids = json.blocks.map((block)=>block.id)
-      blockids = blockids[blockids.length-1]
+      if (json.blocks.length !== 0) {
+        var blockids = json.blocks.map(block => block.id);
+        blockids = blockids[blockids.length - 1];
 
-        blockids = blockids.replace('B','')
-      this.stateNumber = parseInt(blockids)+1
+        blockids = blockids.replace("B", "");
+        this.stateNumber = parseInt(blockids) + 1;
       }
-      console.log('number')
-      console.log(this.stateNumber)
+      console.log("number");
+      console.log(this.stateNumber);
       return json;
     },
     tick: function() {
@@ -174,52 +199,56 @@ export default {
     },
     run_simulation: function() {
       var that = this;
-      if (that.graph.blocks){
-
+      if (that.graph.blocks) {
         var increment = that.settings.svgWigth / that.graph.blocks.length;
 
-      that.simulation = d3
-        .forceSimulation(that.graph.blocks)
-        .on("tick", this.tick)
-        .force("link", d3.forceLink(that.graph.links).distance(increment))
+        that.simulation = d3
+          .forceSimulation(that.graph.blocks)
+          .on("tick", this.tick)
+          .force("link", d3.forceLink(that.graph.links).distance(increment))
 
-        .force("forceY", d3.forceY(that.settings.svgHeight / 2).strength(100));
+          .force(
+            "forceY",
+            d3.forceY(that.settings.svgHeight / 2).strength(100)
+          );
 
-      var previousposition = -increment + 10;
-      for (var node in that.graph.blocks) {
-        that.graph.blocks[node].x = previousposition + increment;
-        previousposition = that.graph.blocks[node].x;
-      }
-      if (that.graph.blocks.length != 0){
-
-        that.graph.blocks[0].x = 10;
-      that.graph.blocks[that.graph.blocks.length - 1].x =
-        that.settings.svgWigth - 110;
-      }
+        var previousposition = -increment + 10;
+        for (var node in that.graph.blocks) {
+          that.graph.blocks[node].x = previousposition + increment;
+          previousposition = that.graph.blocks[node].x;
+        }
+        if (that.graph.blocks.length != 0) {
+          that.graph.blocks[0].x = 10;
+          that.graph.blocks[that.graph.blocks.length - 1].x =
+            that.settings.svgWigth - 110;
+        }
       }
     },
     addBlock: async function(data) {
       this.dialog = false;
       eel.add_block(data.value, "B" + String(this.stateNumber), data.active)(
-        result => {if (result != true){
-        this.snackBarText = result
-        this.openSnackBar = true
-      }}
+        result => {
+          if (result != true) {
+            this.snackBarText = result;
+            this.openSnackBar = true;
+          }
+        }
       );
       this.stateNumber++;
       this.loadInitial();
-      this.run_simulation();
-      
+      // this.run_simulation();
     },
     addPath: function(data) {
       this.path_dialog = false;
-      
-      eel.add_path(data.from,data.to)((result) => {if (result != true){
-        this.snackBarText = result
-        this.openSnackBar = true
-      }})
+
+      eel.add_path(data.from, data.to)(result => {
+        if (result != true) {
+          this.snackBarText = result;
+          this.openSnackBar = true;
+        }
+      });
       this.loadInitial();
-      this.run_simulation();
+      // this.run_simulation();
     },
 
     delete_dialog_prepare: function(string) {
@@ -245,29 +274,46 @@ export default {
       this.delete_dialog = false;
       if (this.delete_title === "path") {
         this.delete_title = "";
-        eel.del_path(data)(result => {if (result != true){
-        this.snackBarText = result
-        this.openSnackBar = true
-      }});
+        eel.del_path(data)(result => {
+          if (result != true) {
+            this.snackBarText = result;
+            this.openSnackBar = true;
+          }
+        });
       } else if (this.delete_title === "block") {
-        eel.del_block(data)(result => {if (result != true){
-        this.snackBarText = result
-        this.openSnackBar = true
-      }});
+        eel.del_block(data)(result => {
+          if (result != true) {
+            this.snackBarText = result;
+            this.openSnackBar = true;
+          }
+        });
       }
       this.loadInitial();
     },
 
     solve: function() {
-      eel.solve_rbd()(result => {if(result[1] != true){
-this.snackBarText = result[0]
-        this.openSnackBar = true
-      }else{
-        this.availability = result[0]
-      }});
+      eel.solve_rbd()(result => {
+        if (result[1] != true) {
+          this.snackBarText = result[0];
+          this.openSnackBar = true;
+        } else {
+          this.availability = result[0];
+        }
+      });
     },
-    attachChainToBlock: function (data){
-      eel.attach_chain(data)((result) => this.$router.push('/markov/'+ result))
+    attachChainToBlock: function(data) {
+      eel.attach_chain(data)(result => this.$router.push("/markov/" + result));
+    },
+    setAvailablity: function(data) {
+      eel.set_availability(data.block, data.value)(result => {
+        if (result != true) {
+          this.snackBarText = result;
+          this.openSnackBar = true;
+        } else {
+          this.set_dialog = false;
+          this.loadInitial();
+        }
+      });
     }
   }
 };

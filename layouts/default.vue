@@ -1,6 +1,12 @@
 <template>
   <v-app dark>
-    <SaveDialog :save_dialog="save_dialog" @save="save" @close="save_dialog=false"></SaveDialog>
+    <SaveDialog :save_dialog="save_dialog" @save="save" @close="save_dialog=false"/>
+    <LoadDialog
+    :items="load_items"
+    :load_dialog="load_dialog"
+    @close="load_dialog=false"
+    @load="load"
+    />
     <v-navigation-drawer
       :mini-variant.sync="miniVariant"
       :clipped="clipped"
@@ -42,10 +48,10 @@
       <v-toolbar-title v-text="title" ></v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn class="mx-3 mt-5"  fab bottom right icon color="blue" @click.stop="save_dialog=true">
-        <v-icon>backup</v-icon>
+        <v-icon>file_download</v-icon>
       </v-btn>
-      <v-btn class="mx-3 mt-5 pl-5"  fab bottom right icon color="green" @click.stop="load">
-        <v-icon>launcher</v-icon>
+      <v-btn class="mx-3 mt-5 "  fab bottom right icon color="green" @click.stop="prepareDialog">
+        <v-icon>file_upload</v-icon>
       </v-btn>
       <v-btn class="mx-3 mt-5"  fab bottom right icon color="pink" @click.stop="refresh">
         <v-icon>cached</v-icon>
@@ -83,9 +89,13 @@
 <script>
 import SnackBar from "../components/SnackBar"
 import SaveDialog from "../components/SaveDialog"
+import LoadDialog from "../components/LoadDialog"
+import { async } from 'q';
 export default {
   data() {
     return {
+      load_items:[],
+      load_dialog:false,
       save_dialog:false,
       snackBarText:'loren',
       openSnackBar:false,
@@ -109,7 +119,8 @@ export default {
   },
   components:{
     SnackBar,
-    SaveDialog
+    SaveDialog,
+    LoadDialog
   },
   
   methods: {
@@ -128,12 +139,19 @@ export default {
       this.save_dialog = false
       
     },
-    load: async function () {
-      eel.load()((result) => {if (result != true){
+    prepareDialog: async function(){
+      eel.prepare_load()((result) => this.load_items = result)
+      this.load_dialog=true
+    },
+    load: async function (name) {
+      eel.load(name)((result) => {if (result != true){
         this.snackBarText = result
         this.openSnackBar = true
+      }else{
+        this.load_dialog=false
+        this.$router.push('/rbd_main')
       }} )
-      this.$router.push('/rbd_main')
+      
     }
   }
 };

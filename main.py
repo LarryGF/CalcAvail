@@ -2,6 +2,7 @@ import eel
 import random
 import json
 import os
+import fs
 from availabilipy.classes import *
 
 os.makedirs('saves', exist_ok=True)
@@ -34,13 +35,20 @@ def save(name):
     except Exception as e:
         return str(e)
 
+@eel.expose
+def prepare_load():
+    saves_dir = fs.open_fs(save_folder)
+    saves_list = list(saves_dir.filterdir(path='.', files=['*.json'], exclude_dirs=['*']))
+    saves_list = [save.name for save in saves_list]
+    return saves_list
 
 @eel.expose
-def load():
+def load(name):
     print("Loading from json")
     try:
-        file = open('save.json')
+        file = open(os.path.join(save_folder,name))
         data = json.load(file)
+        print(data)
         file.close()
         create_rbd()
         load_blocks(data['rbd']['blocks'])
@@ -49,6 +57,7 @@ def load():
         return True
 
     except Exception as e:
+        print(str(e))
         return str(e)
 
 
@@ -227,6 +236,18 @@ def solve_rbd():
 
     except Exception as e:
         return (str(e), False)
+
+@eel.expose
+def set_availability(block, amount):
+    try:
+        block = search_block(block)
+        block.block_availability = float(amount)
+        if block.embedded_chain:
+            block.embedded_chain.availability = float(amount)
+
+        return True
+    except Exception as e:
+        return str(e)
 
 ############################################# CTMC #################################################################
 
