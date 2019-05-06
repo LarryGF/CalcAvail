@@ -8,7 +8,7 @@
             <v-toolbar-title ><v-icon>{{card.icon}}</v-icon> {{card.title}}</v-toolbar-title>
               <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn icon @click="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
+              <v-btn icon @click.stop="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
             </v-toolbar-items>
           </v-toolbar>
           <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
@@ -19,7 +19,7 @@
             <v-toolbar-title ><v-icon>{{card.icon}}</v-icon> {{card.title}}</v-toolbar-title>
               <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn icon @click="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
+              <v-btn icon @click.stop="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
             </v-toolbar-items>
           </v-toolbar>
           <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
@@ -30,7 +30,7 @@
             <v-toolbar-title ><v-icon>{{card.icon}}</v-icon> {{card.title}}</v-toolbar-title>
               <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn icon @click="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
+              <v-btn icon @click.stop="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
             </v-toolbar-items>
           </v-toolbar>
           <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
@@ -41,7 +41,7 @@
             <v-toolbar-title ><v-icon>{{card.icon}}</v-icon> {{card.title}}</v-toolbar-title>
               <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn icon @click="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
+              <v-btn icon @click.stop="hide(card)"><v-icon>{{card.icon2}}</v-icon></v-btn>
             </v-toolbar-items>
           </v-toolbar>
           <v-card-text class="subheading" v-if="card.show">{{card.text}}</v-card-text>
@@ -97,7 +97,7 @@ export default {
 
         },
         {
-          key:2,
+          key:3,
           title:'Adding a path between two RBD blocks',
           color:'blue-grey darken-3',
           text:"Adding a path is a similar process to creating a new Block. You just have to click the 'Add path' button\
@@ -109,7 +109,7 @@ export default {
 
         },
         {
-          key:3,
+          key:4,
           title:'Delete a block or path',
           color:'blue-grey darken-1',
           text:"Similar to the previous procedures, deleting a block or path is fairly simple, just pick the desired blcok \
@@ -120,7 +120,7 @@ export default {
 
         },
         {
-          key:4,
+          key:5,
           title:'Attach a Markov Chain to a block',
           color:'blue-grey darken-3',
           text:"The 'Attach chain' button creates a new Markov Chain and binds it to a specific block, said Markov Chain \
@@ -136,7 +136,7 @@ export default {
       ],
       cardsGeneral:[
         {
-          key:0,
+          key:6,
           title:'Saving and loading',
           color:'blue-grey darken-1',
           text:"In the top right corner you'll find two buttons for saving and loading your project. The blue floating \
@@ -148,7 +148,7 @@ export default {
 
         },
         {
-          key:1,
+          key:7,
           title:'Refresh the view',
           color:'blue-grey darken-3',
           text:"Since most elements are arranged automatically in the screen it might happen that you encounter some visualization\
@@ -163,7 +163,7 @@ export default {
       ],
       cardsError:[
         {
-          key:0,
+          key:8,
           title:'You need to define a list with all available nodes and that list can not be empty',
           color:'red darken-1',
           text:"Probably one or more of the embedded CTMC has not been solved. For that double click each block of the RBD\
@@ -174,7 +174,7 @@ export default {
 
         },
         {
-          key:1,
+          key:9,
           title:'The destination block has an outgoing path to the source block',
           color:'red darken-3',
           text:"Paths in RBD are one way only, so you can't add a path from source to target and from target to source.",
@@ -186,7 +186,7 @@ export default {
       ],
       cardsBug:[
         {
-          key:0,
+          key:10,
           title:'Adding paths in the RBD',
           color:'purple darken-1',
           text:"In the RBD view, while adding a path, it must be done in order. You should only draw a path between two \
@@ -198,7 +198,7 @@ export default {
 
         },
         {
-          key:1,
+          key:11,
           title:'Maximum blocks allowed',
           color:'purple darken-3',
           text:"In a 15.6' screen with 1920x1080 resolution, the maximum amount of blocks that can be present at the same time\
@@ -215,9 +215,10 @@ export default {
 
   methods: {
     hide: function(card){
-      
+      console.log(card)
       card.show = !card.show
       card.icon2 = (card.icon2 == 'expand_more') ? 'expand_less': 'expand_more'
+      this.$forceUpdate()
     }
   }
 };
