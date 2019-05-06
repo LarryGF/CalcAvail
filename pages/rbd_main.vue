@@ -298,6 +298,7 @@ export default {
           this.openSnackBar = true;
         } else {
           this.availability = result[0];
+          this.loadInitial()
         }
       });
     },

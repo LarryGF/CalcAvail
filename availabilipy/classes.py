@@ -287,22 +287,22 @@ class Parallel_Block:
         return
 
     def calc_availability(self):
+        if not self.embedded_chain  and not self.block_availability :
+            raise Exception('There is no embedded chain')
+        if self.embedded_chain:
+            if self.embedded_chain.nodelist == None or len(self.embedded_chain.nodelist) == 0:
+                raise Exception(
+                    'You need to define a list with all available nodes')
 
-        if not self.block_availability:
-            if self.embedded_chain == None:
-                raise Exception('There is no embedded chain')
+        if self.embedded_chain:
+            for nodeid in self.embedded_chain.nodelist:
+                if self.embedded_chain.nodelist.count(nodeid) > 1:
+                    raise Exception('You have repeated nodes')
+
+        if not self.embedded_chain and self.block_availability:
+            avail = self.block_availability
         else:
-            return self.block_availability
-
-        if self.embedded_chain.nodelist == None or len(self.embedded_chain.nodelist) == 0:
-            raise Exception(
-                'You need to define a list with all available nodes')
-
-        for nodeid in self.embedded_chain.nodelist:
-            if self.embedded_chain.nodelist.count(nodeid) > 1:
-                raise Exception('You have repeated nodes')
-
-        avail = self.embedded_chain.get_availability()
+            avail = self.embedded_chain.get_availability()
 
         if self.amount == 2:
             if self.valid == 1:
