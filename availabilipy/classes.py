@@ -147,7 +147,7 @@ class MarkovChain:
 
 
 class Block:
-    "Describes a block from an RBD"
+    """Describes a block from an RBD"""
 
     def __init__(self, blockid: str, isFirst: bool, isLast: bool):
         self.blockid = blockid

@@ -140,8 +140,9 @@ export default {
           title:'Saving and loading',
           color:'blue-grey darken-1',
           text:"In the top right corner you'll find two buttons for saving and loading your project. The blue floating \
-          action button will save your current work as is. The green floating action button will load the previously saved project\
-          and will take you to the main RBD view.",
+          action button will save your current work as is, it will pop you to give a name to the saved project, it will be saved\
+          under the 'saves' folder with '.json' extension. The green floating action button will prompt you to select one\
+          of the '.json' files saved in the ;saves; folder.and will take you to the main RBD view.",
           icon:'backup', 
           icon2:'expand_more',
           show:false
