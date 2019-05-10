@@ -25,9 +25,9 @@
               label="Availability of the block"
               required
               counter
-              maxlength="5"
+              maxlength="7"
               loading
-              mask="#.####"
+              mask="#.#####"
               return-masked-value
               @keyup.enter.native="save"
             >
@@ -38,7 +38,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" flat @click="$emit('close')">Close</v-btn>
-          <v-btn color="blue darken-1" flat @click="save">Create</v-btn>
+          <v-btn color="blue darken-1" flat @click="save">Set</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     progress () {
-      return Math.min(100, this.value.length * 20)
+      return Math.min(100, this.value.length * 15)
     },
     color () {
       return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]

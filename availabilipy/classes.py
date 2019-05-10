@@ -387,7 +387,7 @@ class RBD:
             'blocks': [{
                 'id': n.blockid,
                 'amount': n.amount,
-                'availability':  round(n.block_availability,4) if not n.embedded_chain else round(n.embedded_chain.availability,4),
+                'availability':  round(n.block_availability,5) if not n.embedded_chain else round(n.embedded_chain.availability,5),
                 'chainid': n.embedded_chain.chainid if n.embedded_chain else None,
                 'valid': n.valid if type(n)==Parallel_Block else 0
             } for n in self.blocks],

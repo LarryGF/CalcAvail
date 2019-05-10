@@ -20,7 +20,7 @@
     />
 
     <v-flex xs12>
-      <MarkovChain :viewBox="viewBox" :settings="settings" :graph="graph"/>
+      <MarkovChain :viewBox="viewBox" :settings="settings" :graph="graph" />
     </v-flex>
     <v-flex xs12>
       <v-layout row mt-1>
@@ -32,6 +32,19 @@
         <v-btn color="error" @click="delete_dialog_prepare('node')"><v-icon>delete</v-icon>Delete node</v-btn>
         <v-btn color="error" @click="delete_dialog_prepare('transition')"><v-icon>delete</v-icon>Delete transition</v-btn>
         <v-spacer></v-spacer>
+        <v-slider
+          v-model="slider"
+          thumb-label
+          max="600"
+          min="100"
+          @change="run_simulation"
+          height="20"
+          append-icon="zoom_in"
+        prepend-icon="zoom_out"
+        ></v-slider>
+        
+        <v-spacer ></v-spacer>
+
         <v-btn  outline > Availability: {{availability}}</v-btn>
       </v-layout>
     </v-flex>
@@ -50,6 +63,7 @@ import AddNodeDialog from "../../components/AddNodeDialog"
 export default {
   data: function() {
     return {
+      slider:100,
       add_dialog:false,
       snackBarText:'loren',
       openSnackBar:false,
@@ -189,8 +203,8 @@ export default {
           "link",
           d3
             .forceLink(that.graph.links)
-            .distance(200)
-            .strength(0.01)
+            .distance(this.slider)
+            .strength(0.3)
         )
         .force(
           "center",

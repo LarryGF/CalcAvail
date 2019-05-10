@@ -232,7 +232,7 @@ def solve_rbd():
     print('Solving RBD')
     try:
         persistent_data['rbd'].solve_rbd()
-        return (round(persistent_data['rbd'].availability, 4), True)
+        return (round(persistent_data['rbd'].availability, 5), True)
 
     except Exception as e:
         return (str(e), False)
@@ -348,7 +348,7 @@ def solve_chain():
     try:
         result = current_chain.get_availability()
 
-        return (round(result, 4),True)
+        return (round(result, 5),True)
 
     except Exception as e:
         return (str(e),False)

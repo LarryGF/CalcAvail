@@ -59,7 +59,7 @@
             :key="'labeledge' + index"
             class="edgelabel"
             :id="'edgelabel' + index"
-            font-size="20"
+            font-size="15"
             fill="#aaa"
             style="pointer-events: none;"
             dy="-15"
@@ -83,7 +83,7 @@ export default {
   props: {
     settings: Object,
     viewBox: String,
-    graph: Object
+    graph: Object,
 
   },
   data: () => ({
