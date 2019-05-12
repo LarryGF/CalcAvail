@@ -14,3 +14,7 @@ dist
 *.json
 
 saves
+
+__pycache__
+
+.vscode
