@@ -43,9 +43,9 @@
               required
               :rules="[rules.required]"
               counter
-              maxlength="7"
+              maxlength="10"
               loading
-              mask="#.#####"
+              mask="#.########"
               return-masked-value
               @keyup.enter.native="save"
 
@@ -89,7 +89,7 @@ export default {
   },
   computed: {
     progress () {
-      return Math.min(100, this.value.length * 15)
+      return Math.min(100, this.value.length * 10)
     },
     color () {
       return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]
