@@ -5,7 +5,7 @@ module.exports = {
    ** Headers of the page
    */
   head: {
-    title: 'vydia-frontend',
+    title: 'AvilabiliCalc',
     meta: [{
       charset: 'utf-8'
     },
