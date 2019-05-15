@@ -1,4 +1,4 @@
-# Welcome to AvailabiliCalc
+# Welcome to CalcAvail
 
 > Nuxt.js + Vuetify.js + Python project
 
